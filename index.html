@@ -1,0 +1,471 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SNAKE LUXE - تجربة الثعبان الفاخرة</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@0,900;1,900&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --font-sans: "Inter", sans-serif;
+            --font-display: "Playfair Display", serif;
+        }
+        body {
+            background-color: #000;
+            color: #fff;
+            font-family: var(--font-sans);
+            overflow: hidden;
+            margin: 0;
+        }
+        .gold-text {
+            background: linear-gradient(to bottom right, #BF953F, #FCF6BA, #B38728, #FBF5B7, #AA771C);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .glamour-shadow {
+            box-shadow: 0 0 30px rgba(212, 175, 55, 0.15);
+        }
+        canvas {
+            background: #050505;
+            image-rendering: pixelated;
+        }
+        .shop-modal {
+            background: rgba(10, 10, 10, 0.95);
+            backdrop-filter: blur(20px);
+        }
+        @keyframes pulse-gold {
+            0%, 100% { opacity: 0.8; }
+            50% { opacity: 1; transform: scale(1.05); }
+        }
+        .animate-pulse-gold {
+            animation: pulse-gold 2s infinite ease-in-out;
+        }
+        .hide-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Main App Container -->
+    <div id="app" class="relative h-screen w-screen flex flex-col items-center justify-center bg-[radial-gradient(circle_at_50%_50%,#1a1a1a_0%,#000_100%)]">
+        
+        <!-- Header Stats -->
+        <div id="ui-top" class="fixed top-8 left-8 right-8 z-10 flex justify-between items-center opacity-0 transition-opacity duration-1000">
+            <div class="flex items-center gap-10">
+                <div class="flex flex-col">
+                    <span class="text-[10px] uppercase tracking-[0.2em] text-zinc-500">أعلى نتيجة</span>
+                    <span id="high-score-val" class="text-3xl font-display italic text-amber-500">0</span>
+                </div>
+                <div class="flex flex-col">
+                    <span class="text-[10px] uppercase tracking-[0.2em] text-zinc-500">العملات</span>
+                    <span class="text-3xl font-display flex items-center gap-2">
+                        <i data-lucide="coins" class="w-5 h-5 text-amber-400"></i>
+                        <span id="coins-val">0</span>
+                    </span>
+                </div>
+            </div>
+            <button onclick="toggleShop(true)" class="group flex items-center gap-3 px-6 py-3 rounded-full border border-white/10 bg-white/5 hover:bg-white/10 transition-all">
+                <i data-lucide="shopping-bag" class="w-4 h-4"></i>
+                <span class="text-sm font-medium">المتجر</span>
+            </button>
+        </div>
+
+        <!-- Start Screen -->
+        <div id="screen-start" class="flex flex-col items-center z-10">
+            <h1 class="text-9xl font-display italic gold-text mb-2 tracking-tighter animate-float">SNAKE</h1>
+            <p class="text-zinc-500 text-xs tracking-[0.5em] mb-12 uppercase">Luxury Edition</p>
+            <button onclick="startGame()" class="group relative overflow-hidden px-16 py-6 border border-amber-500/30 rounded-full bg-transparent text-amber-500 hover:text-black transition-colors duration-500">
+                <div class="absolute inset-0 bg-amber-500 translate-x-[-101%] group-hover:translate-x-0 transition-transform duration-500"></div>
+                <span class="relative z-10 text-xl font-medium tracking-[0.2em] flex items-center gap-3">
+                    ابدأ اللعب <i data-lucide="play" class="w-5 h-5 fill-current"></i>
+                </span>
+            </button>
+        </div>
+
+        <!-- Game Screen -->
+        <div id="screen-game" class="hidden flex flex-col items-center z-10">
+            <div class="mb-6 flex flex-col items-center">
+                <span class="text-[10px] uppercase tracking-[0.2em] text-zinc-500 mb-1">النقاط الحالية</span>
+                <span id="current-score-val" class="text-6xl font-display italic">0</span>
+            </div>
+            <div class="p-1 bg-gradient-to-tr from-white/10 to-white/5 rounded-2xl glamour-shadow">
+                <canvas id="gameCanvas" width="400" height="400" class="rounded-xl"></canvas>
+            </div>
+            <p class="mt-8 text-zinc-600 text-[10px] tracking-widest uppercase animate-pulse">استخدم الأسهم للتحكم</p>
+        </div>
+
+        <!-- GameOver Screen -->
+        <div id="screen-over" class="hidden flex flex-col items-center z-10 text-center">
+            <h2 class="text-7xl font-display italic text-red-500 mb-8 tracking-tighter">GAME OVER</h2>
+            <div class="bg-white/5 border border-white/10 p-10 rounded-[2.5rem] backdrop-blur-xl mb-10 min-w-[350px]">
+                <div class="flex justify-between items-center mb-6 border-b border-white/5 pb-4">
+                    <span class="text-zinc-500 uppercase text-[10px] tracking-widest">النتيجة</span>
+                    <span id="final-score-val" class="text-5xl font-display italic">0</span>
+                </div>
+                <div class="flex justify-between items-center">
+                    <span class="text-zinc-500 uppercase text-[10px] tracking-widest">العملات المكتسبة</span>
+                    <span class="text-3xl font-display flex items-center gap-2 text-amber-500">
+                        <i data-lucide="coins" class="w-6 h-6"></i>
+                        <span id="earned-coins-val">+0</span>
+                    </span>
+                </div>
+            </div>
+            <button onclick="startGame()" class="flex items-center gap-4 px-14 py-6 bg-white text-black rounded-full font-bold hover:scale-105 transition-all text-xl">
+                إعادة المحاولة <i data-lucide="rotate-ccw" class="w-6 h-6"></i>
+            </button>
+        </div>
+
+        <!-- Shop Modal -->
+        <div id="shop-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4">
+            <div class="absolute inset-0 bg-black/80 backdrop-blur-md" onclick="toggleShop(false)"></div>
+            <div class="relative w-full max-w-2xl bg-zinc-900 border border-white/10 rounded-[3rem] overflow-hidden shadow-2xl flex flex-col max-h-[85vh]">
+                <div class="p-10 pb-6 flex justify-between items-center">
+                    <div class="flex items-center gap-5">
+                        <div class="w-14 h-14 rounded-2xl bg-amber-500/10 flex items-center justify-center text-amber-500">
+                            <i data-lucide="shopping-bag" class="w-7 h-7"></i>
+                        </div>
+                        <h3 class="text-4xl font-display italic">المتجر</h3>
+                    </div>
+                    <div class="flex items-center gap-6">
+                        <div class="flex items-center gap-2 px-5 py-2.5 bg-white/5 rounded-full border border-white/10">
+                            <i data-lucide="coins" class="w-5 h-5 text-amber-400"></i>
+                            <span id="shop-coins-val" class="font-mono text-xl">0</span>
+                        </div>
+                        <button onclick="toggleShop(false)" class="p-2 hover:bg-white/10 rounded-full transition-colors">
+                            <i data-lucide="x" class="w-7 h-7 text-zinc-500"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="px-10 flex gap-6 border-b border-white/5">
+                    <button id="tab-skins" onclick="setTab('SKINS')" class="pb-4 text-sm font-bold border-b-2 border-amber-500 text-white">الأشكال</button>
+                    <button id="tab-upgrades" onclick="setTab('UPGRADES')" class="pb-4 text-sm font-bold border-b-2 border-transparent text-zinc-500 hover:text-white">التطويرات</button>
+                </div>
+
+                <div id="shop-content" class="flex-1 overflow-y-auto p-10 pt-8 hide-scrollbar">
+                    <!-- Content injected by JS -->
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        // --- Game Config & State ---
+        const GRID_SIZE = 20;
+        const INITIAL_SPEED = 150;
+        const SPEED_INCREMENT = 2;
+        const MIN_SPEED = 60;
+
+        let canvas, ctx;
+        let snake = [];
+        let food = {x: 5, y: 5};
+        let direction = 'UP';
+        let nextDirection = 'UP';
+        let gameActive = false;
+        let score = 0;
+        let gameLoop;
+
+        // Persistent Data
+        let data = {
+            highScore: 0,
+            coins: 0,
+            ownedSkins: ['default'],
+            currentSkin: 'default',
+            upgrades: { magnet: 0, speed: 0, double: 0 }
+        };
+
+        const SKINS = [
+            { id: 'default', name: 'الكلاسيكي', color: '#10b981', price: 0 },
+            { id: 'gold', name: 'الإمبراطوري الزهبي', color: '#fbbf24', price: 500, grad: ['#BF953F', '#FCF6BA', '#B38728'] },
+            { id: 'neon', name: 'السايبر الوردي', color: '#ec4899', price: 300, pulse: true },
+            { id: 'rainbow', name: 'طيف المطر', color: '#3b82f6', price: 800, animated: true },
+            { id: 'shadow', name: 'الظل الأسود', color: '#333', price: 1000 },
+        ];
+
+        const UPGRADES = [
+            { id: 'magnet', name: 'المغناطيس', desc: 'جذب الطعام من مسافة قريبة', price: 400, max: 3, icon: 'sparkles' },
+            { id: 'speed', name: 'خفة الحركة', desc: 'يقلل من زيادة السرعة مع الوقت', price: 300, max: 5, icon: 'zap' },
+            { id: 'double', name: 'مضاعف الذهب', desc: 'أرباح مضاعفة دائماً', price: 1500, max: 1, icon: 'trending-up' },
+        ];
+
+        // --- Initialization ---
+        window.onload = () => {
+            canvas = document.getElementById('gameCanvas');
+            ctx = canvas.getContext('2d');
+            loadData();
+            updateUI();
+            lucide.createIcons();
+            document.getElementById('ui-top').style.opacity = '1';
+        };
+
+        function loadData() {
+            const saved = localStorage.getItem('snake_luxe_storage');
+            if (saved) data = JSON.parse(saved);
+        }
+
+        function saveData() {
+            localStorage.setItem('snake_luxe_storage', JSON.stringify(data));
+            updateUI();
+        }
+
+        function updateUI() {
+            document.getElementById('high-score-val').innerText = data.highScore;
+            document.getElementById('coins-val').innerText = data.coins;
+            document.getElementById('shop-coins-val').innerText = data.coins;
+        }
+
+        // --- Game Logic ---
+        function startGame() {
+            hideAllScreens();
+            document.getElementById('screen-game').classList.remove('hidden');
+            score = 0;
+            updateScoreUI();
+            snake = [{x: 10, y: 10}, {x: 10, y: 11}, {x: 10, y: 12}];
+            direction = 'UP';
+            nextDirection = 'UP';
+            placeFood();
+            gameActive = true;
+            if (gameLoop) clearInterval(gameLoop);
+            runLoop();
+        }
+
+        function runLoop() {
+            const speed = Math.max(MIN_SPEED, INITIAL_SPEED - (score * (SPEED_INCREMENT / (1 + data.upgrades.speed * 0.5))));
+            gameLoop = setTimeout(() => {
+                if (!gameActive) return;
+                update();
+                draw();
+                runLoop();
+            }, speed);
+        }
+
+        function update() {
+            direction = nextDirection;
+            const head = {...snake[0]};
+
+            if (direction === 'UP') head.y--;
+            if (direction === 'DOWN') head.y++;
+            if (direction === 'LEFT') head.x--;
+            if (direction === 'RIGHT') head.x++;
+
+            // Wall Collision
+            if (head.x < 0 || head.x >= GRID_SIZE || head.y < 0 || head.y >= GRID_SIZE) return gameOver();
+            // Self Collision
+            if (snake.some(s => s.x === head.x && s.y === head.y)) return gameOver();
+
+            snake.unshift(head);
+
+            // Magnet Upgrade
+            if (data.upgrades.magnet > 0) {
+                const dist = Math.hypot(head.x - food.x, head.y - food.y);
+                if (dist <= data.upgrades.magnet * 1.5 && dist > 0) {
+                    if (food.x < head.x) food.x++; else if (food.x > head.x) food.x--;
+                    if (food.y < head.y) food.y++; else if (food.y > head.y) food.y--;
+                }
+            }
+
+            if (head.x === food.x && head.y === food.y) {
+                score++;
+                updateScoreUI();
+                placeFood();
+            } else {
+                snake.pop();
+            }
+        }
+
+        function draw() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            const size = canvas.width / GRID_SIZE;
+
+            // Grid
+            ctx.strokeStyle = '#111';
+            for(let i=0; i<GRID_SIZE; i++) {
+                ctx.strokeRect(i*size, 0, 0.1, canvas.height);
+                ctx.strokeRect(0, i*size, canvas.width, 0.1);
+            }
+
+            // Food
+            ctx.fillStyle = '#F59E0B';
+            ctx.shadowBlur = 15;
+            ctx.shadowColor = '#F59E0B';
+            ctx.beginPath();
+            ctx.arc(food.x*size + size/2, food.y*size + size/2, size/3, 0, Math.PI*2);
+            ctx.fill();
+
+            // Snake
+            const skin = SKINS.find(s => s.id === data.currentSkin);
+            snake.forEach((seg, i) => {
+                const isHead = i === 0;
+                
+                if (skin.animated) {
+                    ctx.fillStyle = `hsl(${(Date.now()/10 + i*15)%360}, 70%, 50%)`;
+                } else if (skin.grad) {
+                    const g = ctx.createLinearGradient(seg.x*size, seg.y*size, (seg.x+1)*size, (seg.y+1)*size);
+                    g.addColorStop(0, skin.grad[0]); g.addColorStop(0.5, skin.grad[1]); g.addColorStop(1, skin.grad[2]);
+                    ctx.fillStyle = g;
+                } else {
+                    ctx.fillStyle = skin.color;
+                }
+                
+                ctx.shadowBlur = isHead ? 20 : 5;
+                ctx.shadowColor = skin.color;
+                
+                const p = isHead ? 1 : 2;
+                roundRect(ctx, seg.x*size+p, seg.y*size+p, size-p*2, size-p*2, isHead ? 6 : 4);
+                ctx.fill();
+
+                if (isHead) {
+                    ctx.fillStyle = '#000';
+                    ctx.shadowBlur = 0;
+                    ctx.beginPath();
+                    ctx.arc(seg.x*size+size/3, seg.y*size+size/3, 2, 0, Math.PI*2);
+                    ctx.arc(seg.x*size+(size/3)*2, seg.y*size+size/3, 2, 0, Math.PI*2);
+                    ctx.fill();
+                }
+            });
+        }
+
+        function gameOver() {
+            gameActive = false;
+            hideAllScreens();
+            document.getElementById('screen-over').classList.remove('hidden');
+            document.getElementById('final-score-val').innerText = score;
+            
+            const earned = Math.floor(score / 2) * (data.upgrades.double ? 2 : 1);
+            document.getElementById('earned-coins-val').innerText = '+' + earned;
+            
+            data.coins += earned;
+            if (score > data.highScore) data.highScore = score;
+            saveData();
+        }
+
+        function placeFood() {
+            food = {
+                x: Math.floor(Math.random() * GRID_SIZE),
+                y: Math.floor(Math.random() * GRID_SIZE)
+            };
+            if (snake.some(s => s.x === food.x && s.y === food.y)) placeFood();
+        }
+
+        function updateScoreUI() {
+            document.getElementById('current-score-val').innerText = score;
+        }
+
+        // --- Helpers ---
+        function hideAllScreens() {
+            ['screen-start', 'screen-game', 'screen-over'].forEach(s => document.getElementById(s).classList.add('hidden'));
+        }
+
+        function roundRect(ctx, x, y, width, height, radius) {
+            ctx.beginPath(); ctx.moveTo(x + radius, y); ctx.lineTo(x + width - radius, y); ctx.quadraticCurveTo(x + width, y, x + width, y + radius); ctx.lineTo(x + width, y + height - radius); ctx.quadraticCurveTo(x + width, y + height, x + width - radius, y + height); ctx.lineTo(x + radius, y + height); ctx.quadraticCurveTo(x, y + height, x, y + height - radius); ctx.lineTo(x, y + radius); ctx.quadraticCurveTo(x, y, x + radius, y); ctx.closePath();
+        }
+
+        window.addEventListener('keydown', e => {
+            if (e.key === 'ArrowUp' && direction !== 'DOWN') nextDirection = 'UP';
+            if (e.key === 'ArrowDown' && direction !== 'UP') nextDirection = 'DOWN';
+            if (e.key === 'ArrowLeft' && direction !== 'RIGHT') nextDirection = 'LEFT';
+            if (e.key === 'ArrowRight' && direction !== 'LEFT') nextDirection = 'RIGHT';
+        });
+
+        // --- Shop Logic ---
+        let currentTab = 'SKINS';
+        function toggleShop(show) {
+            document.getElementById('shop-modal').classList.toggle('hidden', !show);
+            if (show) setTab(currentTab);
+        }
+
+        function setTab(tab) {
+            currentTab = tab;
+            document.getElementById('tab-skins').className = `pb-4 text-sm font-bold border-b-2 ${tab==='SKINS'?'border-amber-500 text-white':'border-transparent text-zinc-500'}`;
+            document.getElementById('tab-upgrades').className = `pb-4 text-sm font-bold border-b-2 ${tab==='UPGRADES'?'border-amber-500 text-white':'border-transparent text-zinc-500'}`;
+            renderShop();
+        }
+
+        function renderShop() {
+            const container = document.getElementById('shop-content');
+            container.innerHTML = '';
+
+            if (currentTab === 'SKINS') {
+                const grid = document.createElement('div');
+                grid.className = 'grid grid-cols-2 gap-6';
+                SKINS.forEach(skin => {
+                    const isOwned = data.ownedSkins.includes(skin.id);
+                    const isActive = data.currentSkin === skin.id;
+                    const card = `
+                        <div class="p-6 rounded-[2rem] border ${isActive?'border-amber-500 bg-amber-500/5':'border-white/5 bg-white/5'} flex flex-col">
+                            <div class="flex justify-between mb-4">
+                                <div class="w-12 h-12 rounded-xl" style="background: ${skin.grad?`linear-gradient(45deg,${skin.grad[0]},${skin.grad[2]})`:skin.color}; box-shadow: 0 0 15px ${skin.color}55"></div>
+                                <span class="text-xs text-zinc-400 font-mono">${isOwned ? 'تم الامتلاك' : skin.price + ' ذهب'}</span>
+                            </div>
+                            <h4 class="text-xl font-display italic mb-6">${skin.name}</h4>
+                            <button onclick="${isOwned ? `selectSkin('${skin.id}')` : `buySkin('${skin.id}',${skin.price})`}" 
+                                class="w-full py-3 rounded-2xl text-xs font-bold transition-all ${isActive?'bg-amber-500 text-black':(isOwned?'bg-white/10 text-white':'bg-white text-black')}"
+                                ${isActive ? 'disabled' : ''}>
+                                ${isActive ? 'مفعّل' : (isOwned ? 'تفعيل' : 'شراء')}
+                            </button>
+                        </div>`;
+                    grid.innerHTML += card;
+                });
+                container.appendChild(grid);
+            } else {
+                const list = document.createElement('div');
+                list.className = 'space-y-4';
+                UPGRADES.forEach(up => {
+                    const level = data.upgrades[up.id] || 0;
+                    const isMax = level >= up.max;
+                    list.innerHTML += `
+                        <div class="p-6 rounded-[2rem] bg-white/5 border border-white/5 flex items-center justify-between">
+                            <div class="flex items-center gap-6">
+                                <div class="w-14 h-14 rounded-2xl bg-zinc-800 flex items-center justify-center text-zinc-400">
+                                    <i data-lucide="${up.icon}"></i>
+                                </div>
+                                <div>
+                                    <h4 class="text-xl font-display italic">${up.name}</h4>
+                                    <p class="text-[10px] text-zinc-500 font-mono uppercase">${up.desc}</p>
+                                    <div class="flex gap-1 mt-3">
+                                        ${Array.from({length:up.max}).map((_,i) => `<div class="h-1 w-6 rounded-full ${i<level?'bg-amber-500':'bg-white/10'}"></div>`).join('')}
+                                    </div>
+                                </div>
+                            </div>
+                            <button onclick="${isMax ? '' : `buyUpgrade('${up.id}',${up.price})`}" 
+                                class="px-6 py-3 rounded-full font-bold text-sm ${isMax ? 'bg-zinc-800 text-zinc-500' : 'bg-white text-black hover:scale-105 transition-all'}"
+                                ${isMax ? 'disabled' : ''}>
+                                ${isMax ? 'مكتمل' : up.price + ' <i data-lucide="coins" class="inline w-3 h-3"></i>'}
+                            </button>
+                        </div>`;
+                });
+                container.appendChild(list);
+            }
+            lucide.createIcons();
+        }
+
+        function buySkin(id, price) {
+            if (data.coins >= price) {
+                data.coins -= price;
+                data.ownedSkins.push(id);
+                saveData();
+                renderShop();
+            }
+        }
+
+        function selectSkin(id) {
+            data.currentSkin = id;
+            saveData();
+            renderShop();
+        }
+
+        function buyUpgrade(id, price) {
+            if (data.coins >= price) {
+                data.coins -= price;
+                data.upgrades[id]++;
+                saveData();
+                renderShop();
+            }
+        }
+    </script>
+</body>
+</html>
