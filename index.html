@@ -3,447 +3,386 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SNAKE ZEN - النسخة الفاخرة الهادئة</title>
+    <title>SNAKE PRO - النسخة النهائية</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&family=IBM+Plex+Sans+Arabic:wght@300;400;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;700;900&display=swap" rel="stylesheet">
     <style>
         :root {
-            --primary: #10b981; /* Emerald */
+            --primary: #22c55e;
             --bg: #0f172a;
-            --surface: rgba(30, 41, 59, 0.7);
-            --font-main: 'Outfit', 'IBM Plex Sans Arabic', sans-serif;
         }
-
         body {
             background-color: var(--bg);
             color: #f8fafc;
-            font-family: var(--font-main);
+            font-family: 'Tajawal', sans-serif;
             overflow: hidden;
             margin: 0;
             user-select: none;
-            touch-action: none;
+            touch-action: none; /* لمنع التمرير باللمس وفتح المجال للتحكم */
         }
 
-        /* --- شاشة التحميل --- */
         #loading-screen {
-            background: var(--bg);
+            background: #0f172a;
             z-index: 100;
+            transition: opacity 0.5s ease;
         }
 
-        .loader-bar {
-            width: 200px;
-            height: 4px;
-            background: rgba(255, 255, 255, 0.1);
-            border-radius: 10px;
-            overflow: hidden;
-        }
-
-        .loader-progress {
-            width: 0%;
-            height: 100%;
-            background: var(--primary);
-            transition: width 2s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-
-        /* --- الواجهة --- */
         .glass {
-            background: var(--surface);
-            backdrop-filter: blur(12px);
-            border: 1px solid rgba(255, 255, 255, 0.05);
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 1.25rem;
         }
 
-        .screen-container {
-            transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
-        }
-
-        .hidden {
-            display: none !important;
-            opacity: 0;
-            transform: scale(0.95);
-        }
-
-        /* --- تأثيرات اللعبة --- */
         canvas {
-            background-color: #111827;
-            border-radius: 2rem;
-            box-shadow: 0 0 40px rgba(0, 0, 0, 0.5);
-            transition: transform 0.1s ease-out;
+            background-color: #1e293b;
+            border-radius: 1rem;
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.5);
+            display: block;
         }
 
-        /* أنيميشن للحياة */
-        @keyframes pulse-soft {
+        .btn-action {
+            transition: all 0.2s;
+        }
+        .btn-action:active { transform: scale(0.9); }
+
+        .hidden { display: none !important; }
+        
+        @keyframes pulse-custom {
             0%, 100% { transform: scale(1); opacity: 1; }
             50% { transform: scale(1.05); opacity: 0.8; }
         }
-        .animate-soft { animation: pulse-soft 3s infinite ease-in-out; }
-
-        @keyframes slide-up {
-            from { transform: translateY(20px); opacity: 0; }
-            to { transform: translateY(0); opacity: 1; }
-        }
-        .animate-in { animation: slide-up 0.6s ease-out forwards; }
-
-        /* الكيانات */
-        .mission-item {
-            transition: all 0.3s;
-        }
-        .mission-item:hover { border-color: var(--primary); background: rgba(16, 185, 129, 0.05); }
-
+        .animate-pulse-custom { animation: pulse-custom 1.5s infinite; }
     </style>
 </head>
-<body class="flex items-center justify-center min-h-screen p-4">
+<body class="flex items-center justify-center min-h-screen">
 
-    <!-- 1. شاشة التحميل -->
+    <!-- شاشة التحميل -->
     <div id="loading-screen" class="fixed inset-0 flex flex-col items-center justify-center">
-        <div class="mb-8">
-            <i data-lucide="zap" class="w-12 h-12 text-emerald-400 animate-pulse"></i>
-        </div>
-        <h2 class="text-xl font-light tracking-[0.3em] uppercase text-emerald-400 mb-6">SNAKE ZEN</h2>
-        <div class="loader-bar">
-            <div id="load-progress" class="loader-progress"></div>
-        </div>
+        <div class="w-16 h-16 border-4 border-emerald-500 border-t-transparent rounded-full animate-spin mb-4"></div>
+        <h2 class="text-emerald-400 font-bold animate-pulse">جاري التحميل...</h2>
     </div>
 
-    <!-- 2. القائمة الرئيسية -->
-    <div id="main-menu" class="screen-container hidden flex flex-col items-center gap-8 w-full max-w-md animate-in">
-        <div class="text-center">
-            <h1 class="text-7xl font-extrabold tracking-tighter text-white mb-2">ثعبان<span class="text-emerald-500">.</span></h1>
-            <p class="text-slate-500 uppercase tracking-widest text-xs font-bold">Zen Edition</p>
+    <!-- الواجهة الرئيسية -->
+    <div id="main-ui" class="hidden flex flex-col items-center gap-6 w-full max-w-lg p-4">
+        
+        <!-- الهيدر -->
+        <div class="flex justify-between w-full gap-4">
+            <div class="glass flex-1 p-3 flex items-center justify-center gap-2">
+                <i data-lucide="trophy" class="w-4 h-4 text-amber-400"></i>
+                <span id="high-score" class="font-black text-lg">0</span>
+            </div>
+            <div class="glass flex-1 p-3 flex items-center justify-center gap-2">
+                <i data-lucide="gem" class="w-4 h-4 text-emerald-400"></i>
+                <span id="gems-count" class="font-black text-lg">0</span>
+            </div>
+            <button onclick="toggleShop()" class="glass p-3 text-emerald-400 hover:bg-emerald-500/10 transition-colors">
+                <i data-lucide="shopping-bag" class="w-5 h-5"></i>
+            </button>
         </div>
 
-        <div class="flex gap-4 w-full">
-            <div class="glass flex-1 p-6 rounded-[2rem] text-center">
-                <span class="text-[10px] text-slate-500 uppercase font-black block mb-1">الرقم القياسي</span>
-                <span id="best-score" class="text-3xl font-bold text-white">0</span>
-            </div>
-            <div class="glass flex-1 p-6 rounded-[2rem] text-center">
-                <span class="text-[10px] text-slate-500 uppercase font-black block mb-1">الجواهر</span>
-                <div class="flex items-center justify-center gap-2">
-                    <i data-lucide="gem" class="w-4 h-4 text-emerald-400"></i>
-                    <span id="wallet-balance" class="text-3xl font-bold text-white">0</span>
+        <!-- ساحة اللعب -->
+        <div class="relative w-full aspect-square max-w-[400px]">
+            <canvas id="game-canvas" class="w-full h-full"></canvas>
+            
+            <div id="game-overlay" class="absolute inset-0 flex flex-col items-center justify-center bg-slate-900/60 rounded-2xl backdrop-blur-sm z-20">
+                <div id="start-view" class="flex flex-col items-center gap-4">
+                    <h1 class="text-5xl font-black text-white mb-2">SNAKE PRO</h1>
+                    <button onclick="startGame()" class="bg-emerald-500 text-slate-900 px-10 py-4 rounded-xl font-black text-xl animate-pulse-custom shadow-lg shadow-emerald-500/20">ابدأ الآن</button>
+                </div>
+                <div id="over-view" class="hidden flex flex-col items-center gap-4 text-center p-6">
+                    <p class="text-sm uppercase tracking-widest text-slate-400">انـتـهـت الـلـعـبـة</p>
+                    <h2 id="final-score" class="text-7xl font-black text-emerald-400">0</h2>
+                    <button onclick="startGame()" class="bg-white text-slate-900 px-10 py-4 rounded-xl font-black text-xl shadow-lg">حاول مجدداً</button>
                 </div>
             </div>
         </div>
 
-        <button onclick="startGame()" class="w-full py-8 bg-emerald-500 text-slate-900 rounded-[2rem] font-extrabold text-2xl hover:bg-emerald-400 hover:scale-[1.02] active:scale-95 transition-all shadow-xl shadow-emerald-500/20">
-            ابدأ الرحلة
-        </button>
-
-        <div class="grid grid-cols-2 gap-4 w-full">
-            <button onclick="showScreen('shop')" class="glass p-5 rounded-[1.5rem] flex items-center justify-center gap-3 hover:bg-white/5 transition-colors group">
-                <i data-lucide="shopping-bag" class="w-5 h-5 text-emerald-400 group-hover:rotate-12 transition-transform"></i>
-                <span class="text-sm font-bold">المتجر</span>
-            </button>
-            <button onclick="showScreen('missions')" class="glass p-5 rounded-[1.5rem] flex items-center justify-center gap-3 hover:bg-white/5 transition-colors group relative">
-                <i data-lucide="target" class="w-5 h-5 text-emerald-400 group-hover:rotate-12 transition-transform"></i>
-                <span class="text-sm font-bold">المهمات</span>
-                <span id="mission-alert" class="hidden absolute -top-1 -right-1 w-3 h-3 bg-rose-500 rounded-full border-2 border-[#0f172a]"></span>
-            </button>
-        </div>
-    </div>
-
-    <!-- 3. نظام المهمات -->
-    <div id="screen-missions" class="screen-container hidden flex flex-col w-full max-w-md animate-in">
-        <div class="flex justify-between items-center mb-8">
-            <h2 class="text-3xl font-bold">مهمات اليوم</h2>
-            <button onclick="showScreen('main')" class="p-3 glass rounded-full"><i data-lucide="arrow-left"></i></button>
-        </div>
-        <div id="missions-list" class="space-y-4 overflow-y-auto max-h-[60vh] pr-2">
-            <!-- Dynamic Content -->
-        </div>
-    </div>
-
-    <!-- 4. المتجر -->
-    <div id="screen-shop" class="screen-container hidden flex flex-col w-full max-w-md animate-in">
-        <div class="flex justify-between items-center mb-8">
-            <h2 class="text-3xl font-bold">تخصيص</h2>
-            <button onclick="showScreen('main')" class="p-3 glass rounded-full"><i data-lucide="arrow-left"></i></button>
-        </div>
-        <div class="grid grid-cols-2 gap-4" id="shop-grid">
-            <!-- Dynamic Content -->
-        </div>
-    </div>
-
-    <!-- 5. واجهة اللعب -->
-    <div id="screen-game" class="screen-container hidden flex flex-col items-center gap-6 w-full animate-in">
-        <div class="flex items-center justify-between w-full max-w-[500px] mb-2 px-4">
-            <div class="flex flex-col">
-                <span class="text-[10px] text-slate-500 uppercase font-black">النقاط</span>
-                <span id="ingame-score" class="text-3xl font-bold text-emerald-400">0</span>
+        <!-- النقاط و التحكم -->
+        <div class="flex justify-between w-full items-center">
+            <div class="glass p-4 min-w-[120px] text-center">
+                <p class="text-[10px] text-slate-400 uppercase font-black">النقاط</p>
+                <p id="current-score" class="text-4xl font-black text-emerald-400">0</p>
             </div>
-            <div class="flex gap-3">
-                <div id="combo-tag" class="hidden px-4 py-1 bg-rose-500/20 text-rose-500 rounded-full text-xs font-black animate-bounce">COMBO X2</div>
-                <button onclick="pauseGame()" class="p-3 glass rounded-full"><i data-lucide="pause" class="w-5 h-5"></i></button>
-            </div>
-        </div>
-        
-        <div class="relative">
-            <canvas id="game-canvas"></canvas>
-            <div id="pause-overlay" class="hidden absolute inset-0 glass rounded-[2rem] flex items-center justify-center">
-                <button onclick="resumeGame()" class="bg-white text-black p-6 rounded-full shadow-2xl scale-125"><i data-lucide="play" class="fill-current"></i></button>
+
+            <!-- أزرار التحكم للجوال -->
+            <div class="grid grid-cols-3 gap-1 lg:hidden">
+                <div class="col-start-2"><button onpointerdown="setDir(0, -1)" class="w-12 h-12 glass flex items-center justify-center active:bg-emerald-500/50"><i data-lucide="chevron-up"></i></button></div>
+                <button onpointerdown="setDir(1, 0)" class="w-12 h-12 glass flex items-center justify-center active:bg-emerald-500/50"><i data-lucide="chevron-right"></i></button>
+                <button onpointerdown="setDir(0, 1)" class="w-12 h-12 glass flex items-center justify-center active:bg-emerald-500/50"><i data-lucide="chevron-down"></i></button>
+                <button onpointerdown="setDir(-1, 0)" class="w-12 h-12 glass flex items-center justify-center active:bg-emerald-500/50"><i data-lucide="chevron-left"></i></button>
             </div>
         </div>
 
-        <!-- أزرار التحكم للجوال -->
-        <div class="grid grid-cols-3 gap-3 mt-4 lg:hidden">
-            <div></div>
-            <button class="glass p-6 rounded-2xl active:bg-emerald-500/20 transition-colors" ontouchstart="setDirection('UP')"><i data-lucide="chevron-up"></i></button>
-            <div></div>
-            <button class="glass p-6 rounded-2xl active:bg-emerald-500/20 transition-colors" ontouchstart="setDirection('LEFT')"><i data-lucide="chevron-right"></i></button>
-            <button class="glass p-6 rounded-2xl active:bg-emerald-500/20 transition-colors" ontouchstart="setDirection('DOWN')"><i data-lucide="chevron-down"></i></button>
-            <button class="glass p-6 rounded-2xl active:bg-emerald-500/20 transition-colors" ontouchstart="setDirection('RIGHT')"><i data-lucide="chevron-left"></i></button>
+        <!-- المهمات -->
+        <div class="w-full glass p-4">
+            <div class="flex justify-between items-center mb-2">
+                <span class="text-xs font-bold text-slate-400">المهام النشطة</span>
+                <i data-lucide="award" class="w-4 h-4 text-emerald-500"></i>
+            </div>
+            <div id="mission-list" class="space-y-2">
+                <!-- المہمات تظهر هنا -->
+            </div>
         </div>
     </div>
 
-    <!-- 6. شاشة النهاية -->
-    <div id="screen-over" class="screen-container hidden flex flex-col items-center gap-8 animate-in text-center">
-        <div class="w-24 h-24 bg-rose-500/10 rounded-full flex items-center justify-center mb-4">
-            <i data-lucide="skull" class="w-12 h-12 text-rose-500"></i>
-        </div>
-        <h2 class="text-5xl font-black">تحطمت!</h2>
-        <div class="glass p-10 rounded-[3rem] min-w-[300px]">
-            <p class="text-xs text-slate-500 uppercase tracking-widest mb-2">النتيجة النهائية</p>
-            <p id="final-score" class="text-6xl font-bold text-white mb-6">0</p>
-            <div class="flex justify-center gap-3 items-center text-emerald-400">
-                <i data-lucide="gem" class="w-5 h-5"></i>
-                <span id="earned-gems" class="text-xl font-bold">+0</span>
+    <!-- المتجر -->
+    <div id="shop" class="fixed inset-0 z-50 hidden flex items-center justify-center p-4 bg-slate-950/90 backdrop-blur-xl">
+        <div class="w-full max-w-sm glass p-6 fade-in">
+            <div class="flex justify-between mb-6 border-b border-white/10 pb-4">
+                <h3 class="text-2xl font-black">متجر الألوان</h3>
+                <button onclick="toggleShop()" class="text-slate-400"><i data-lucide="x"></i></button>
             </div>
-        </div>
-        <div class="flex flex-col gap-4 w-full">
-            <button onclick="startGame()" class="py-6 bg-emerald-500 text-slate-900 rounded-[2rem] font-extrabold text-xl">حاول مجدداً</button>
-            <button onclick="showScreen('main')" class="text-slate-500 font-bold hover:text-white transition-colors">العودة للرئيسية</button>
+            <div id="shop-items" class="space-y-3 max-h-[50vh] overflow-y-auto pr-2">
+                <!-- ألوان المتجر -->
+            </div>
         </div>
     </div>
 
     <script>
-        // --- البيانات والوضع العام ---
-        let state = {
-            highScore: parseInt(localStorage.getItem('zen_snake_hs')) || 0,
-            gems: parseInt(localStorage.getItem('zen_snake_gems')) || 0,
-            ownedSkins: JSON.parse(localStorage.getItem('zen_snake_skins')) || ['default'],
-            currentSkin: localStorage.getItem('zen_snake_active') || 'default',
-            missions: [
-                { id: 1, title: "صياد البداية", desc: "أكل 20 قطعة طعام", target: 20, progress: 0, reward: 50, claimed: false },
-                { id: 2, title: "المحترف", desc: "صل لنتيجة 100", target: 100, progress: 0, reward: 200, claimed: false },
-                { id: 3, title: "سيد الزن", desc: "العب 5 مرات", target: 5, progress: 0, reward: 100, claimed: false }
-            ]
-        };
-
-        const skins = {
-            'default': { name: 'الأصلي', color: '#10b981', price: 0 },
-            'ocean': { name: 'المحيط', color: '#0ea5e9', price: 100 },
-            'rose': { name: 'الورد', color: '#f43f5e', price: 250 },
-            'gold': { name: 'الفاخر', color: '#fbbf24', price: 500 },
-            'void': { name: 'الفراغ', color: '#8b5cf6', price: 1000 }
-        };
-
         const canvas = document.getElementById('game-canvas');
         const ctx = canvas.getContext('2d');
-        const GRID = 20;
-        let snake = [], food = {}, dx = 0, dy = -1, score = 0, gameLoop, paused = false;
-
-        // --- نظام التوجيه والواجهة ---
-        window.onload = () => {
-            const bar = document.getElementById('load-progress');
-            bar.style.width = "100%";
-            setTimeout(() => {
-                document.getElementById('loading-screen').classList.add('hidden');
-                showScreen('main');
-                lucide.createIcons();
-            }, 2200);
-            updateUI();
+        const TILE_COUNT = 20;
+        
+        let state = {
+            snake: [],
+            food: {x: 5, y: 5},
+            dx: 1, dy: 0,
+            nextDx: 1, nextDy: 0,
+            score: 0,
+            speed: 130,
+            gameActive: false,
+            gems: parseInt(localStorage.getItem('snk_gems')) || 0,
+            highScore: parseInt(localStorage.getItem('snk_hs')) || 0,
+            activeColor: localStorage.getItem('snk_color') || '#22c55e',
+            ownedColors: JSON.parse(localStorage.getItem('snk_owned')) || ['#22c55e'],
+            loop: null
         };
 
-        function showScreen(id) {
-            document.querySelectorAll('.screen-container').forEach(s => s.classList.add('hidden'));
-            document.getElementById(`screen-${id === 'main' ? 'main-menu' : id}`).classList.remove('hidden');
-            if (id === 'shop') renderShop();
-            if (id === 'missions') renderMissions();
+        const SHOP_COLORS = [
+            { name: 'أخضر غابة', color: '#22c55e', price: 0 },
+            { name: 'أزرق محيطي', color: '#3b82f6', price: 50 },
+            { name: 'أرجواني نيون', color: '#a855f7', price: 150 },
+            { name: 'ورد صلب', color: '#f43f5e', price: 300 },
+            { name: 'ذهب ملكي', color: '#fbbf24', price: 500 }
+        ];
+
+        window.onload = () => {
+            initGame();
+            setTimeout(() => {
+                document.getElementById('loading-screen').style.opacity = '0';
+                setTimeout(() => {
+                    document.getElementById('loading-screen').remove();
+                    document.getElementById('main-ui').classList.remove('hidden');
+                }, 500);
+            }, 1000);
+        };
+
+        function initGame() {
+            renderStats();
+            renderMissions();
             lucide.createIcons();
+            const size = 400; // حجم ثابت لسهولة الحساب
+            canvas.width = size;
+            canvas.height = size;
+            drawPlaceholder();
         }
 
-        function updateUI() {
-            document.getElementById('best-score').innerText = state.highScore;
-            document.getElementById('wallet-balance').innerText = state.gems;
-            const hasUnclaimed = state.missions.some(m => m.progress >= m.target && !m.claimed);
-            document.getElementById('mission-alert').classList.toggle('hidden', !hasUnclaimed);
-        }
-
-        // --- منطق اللعبة ---
         function startGame() {
-            const size = Math.min(window.innerWidth - 40, 500);
-            canvas.width = size; canvas.height = size;
-            const tiles = Math.floor(size / GRID);
-
-            showScreen('game');
-            score = 0;
-            paused = false;
-            dx = 0; dy = -1;
-            snake = [{x: 10, y: 10}, {x:10, y:11}, {x:10, y:12}];
+            state.gameActive = true;
+            state.score = 0;
+            state.speed = 130;
+            state.dx = 1; state.dy = 0;
+            state.nextDx = 1; state.nextDy = 0;
+            state.snake = [{x: 10, y: 10}, {x: 9, y: 10}, {x: 8, y: 10}];
             
-            placeFood(tiles);
-            clearInterval(gameLoop);
-            gameLoop = setInterval(() => update(tiles), 110);
+            document.getElementById('game-overlay').classList.add('hidden');
+            document.getElementById('start-view').classList.add('hidden');
+            document.getElementById('over-view').classList.add('hidden');
             
-            // تحديث مهمات المحاولة
-            trackMission(3, 1);
+            updateScore();
+            placeFood();
+            
+            clearTimeout(state.loop);
+            gameLoop();
         }
 
-        function update(tiles) {
-            if (paused) return;
+        function gameLoop() {
+            if(!state.gameActive) return;
+            update();
+            draw();
+            state.loop = setTimeout(gameLoop, state.speed);
+        }
 
-            const head = { x: snake[0].x + dx, y: snake[0].y + dy };
+        function update() {
+            state.dx = state.nextDx;
+            state.dy = state.nextDy;
+            
+            const head = { x: state.snake[0].x + state.dx, y: state.snake[0].y + state.dy };
 
-            // تصادم
-            if (head.x < 0 || head.x >= tiles || head.y < 0 || head.y >= tiles ||
-                snake.some(s => s.x === head.x && s.y === head.y)) {
-                return gameOver();
-            }
+            // تصادم الجدران
+            if (head.x < 0 || head.x >= TILE_COUNT || head.y < 0 || head.y >= TILE_COUNT) return gameOver();
+            
+            // تصادم الجسم
+            if (state.snake.some(s => s.x === head.x && s.y === head.y)) return gameOver();
 
-            snake.unshift(head);
-            if (head.x === food.x && head.y === food.y) {
-                score += 10;
-                document.getElementById('ingame-score').innerText = score;
-                placeFood(tiles);
-                
-                // تحديث المهمات
-                trackMission(1, 1);
-                if (score >= 100) trackMission(2, 100);
+            state.snake.unshift(head);
+
+            // أكل الطعام
+            if (head.x === state.food.x && head.y === state.food.y) {
+                state.score += 10;
+                state.gems += 2;
+                state.speed = Math.max(60, state.speed - 1.5);
+                updateScore();
+                placeFood();
+                renderMissions();
+                save();
             } else {
-                snake.pop();
+                state.snake.pop();
             }
-            draw(tiles);
         }
 
-        function draw(tiles) {
-            const sz = canvas.width / tiles;
-            ctx.fillStyle = '#111827';
-            ctx.fillRect(0,0, canvas.width, canvas.height);
+        function draw() {
+            const sz = canvas.width / TILE_COUNT;
+            ctx.fillStyle = '#1e293b';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
 
             // طعام
             ctx.fillStyle = '#f43f5e';
             ctx.beginPath();
-            ctx.roundRect(food.x * sz + 4, food.y * sz + 4, sz - 8, sz - 8, 8);
+            ctx.arc(state.food.x * sz + sz/2, state.food.y * sz + sz/2, sz/2 - 4, 0, Math.PI * 2);
             ctx.fill();
 
             // ثعبان
-            const skinColor = skins[state.currentSkin].color;
-            snake.forEach((s, i) => {
-                ctx.fillStyle = i === 0 ? '#fff' : skinColor;
+            state.snake.forEach((s, i) => {
+                ctx.fillStyle = i === 0 ? '#fff' : state.activeColor;
                 ctx.beginPath();
-                ctx.roundRect(s.x * sz + 1, s.y * sz + 1, sz - 2, sz - 2, i === 0 ? 8 : 4);
+                ctx.roundRect(s.x * sz + 1, s.y * sz + 1, sz - 2, sz - 2, 4);
                 ctx.fill();
             });
         }
 
-        function placeFood(tiles) {
-            food = { x: Math.floor(Math.random()*tiles), y: Math.floor(Math.random()*tiles) };
-            if (snake.some(s => s.x === food.x && s.y === food.y)) placeFood(tiles);
+        function drawPlaceholder() {
+            ctx.fillStyle = '#1e293b';
+            ctx.fillRect(0,0,canvas.width,canvas.height);
         }
 
         function gameOver() {
-            clearInterval(gameLoop);
-            showScreen('over');
-            document.getElementById('final-score').innerText = score;
-            const earned = Math.floor(score / 2);
-            document.getElementById('earned-gems').innerText = `+${earned}`;
-            state.gems += earned;
-            if (score > state.highScore) state.highScore = score;
+            state.gameActive = false;
+            if(state.score > state.highScore) state.highScore = state.score;
             save();
-            updateUI();
+            renderStats();
+            document.getElementById('final-score').innerText = state.score;
+            document.getElementById('game-overlay').classList.remove('hidden');
+            document.getElementById('over-view').classList.remove('hidden');
         }
 
-        function pauseGame() { paused = !paused; document.getElementById('pause-overlay').classList.toggle('hidden'); }
-        function resumeGame() { paused = false; document.getElementById('pause-overlay').classList.add('hidden'); }
+        function placeFood() {
+            state.food = { x: Math.floor(Math.random() * TILE_COUNT), y: Math.floor(Math.random() * TILE_COUNT) };
+            if (state.snake.some(s => s.x === state.food.x && s.y === state.food.y)) placeFood();
+        }
 
-        // --- المتجر والمهمات ---
+        function updateScore() {
+            document.getElementById('current-score').innerText = state.score;
+            document.getElementById('gems-count').innerText = state.gems;
+        }
+
+        function renderStats() {
+            document.getElementById('high-score').innerText = state.highScore;
+            document.getElementById('gems-count').innerText = state.gems;
+        }
+
+        function setDir(x, y) {
+            // منع الرجوع العكسي
+            if (x !== 0 && state.dx === -x) return;
+            if (y !== 0 && state.dy === -y) return;
+            state.nextDx = x;
+            state.nextDy = y;
+        }
+
+        function save() {
+            localStorage.setItem('snk_hs', state.highScore);
+            localStorage.setItem('snk_gems', state.gems);
+            localStorage.setItem('snk_color', state.activeColor);
+            localStorage.setItem('snk_owned', JSON.stringify(state.ownedColors));
+        }
+
+        function toggleShop() {
+            const shop = document.getElementById('shop');
+            shop.classList.toggle('hidden');
+            if(!shop.classList.contains('hidden')) renderShop();
+        }
+
         function renderShop() {
-            const grid = document.getElementById('shop-grid');
-            grid.innerHTML = Object.entries(skins).map(([id, s]) => {
-                const owned = state.ownedSkins.includes(id);
-                const active = state.currentSkin === id;
+            const container = document.getElementById('shop-items');
+            container.innerHTML = SHOP_COLORS.map(c => {
+                const owned = state.ownedColors.includes(c.color);
+                const active = state.activeColor === c.color;
                 return `
-                    <div class="glass p-5 rounded-[2rem] flex flex-col items-center gap-4 ${active ? 'border-emerald-500' : ''}">
-                        <div class="w-12 h-12 rounded-xl" style="background:${s.color}; box-shadow: 0 0 20px ${s.color}44"></div>
-                        <div class="text-center">
-                            <p class="font-bold text-sm text-white">${s.name}</p>
-                            <p class="text-[10px] text-slate-500 font-bold">${owned ? 'ممتلك' : s.price + ' جوهرة'}</p>
+                    <div class="glass p-3 flex justify-between items-center">
+                        <div class="flex items-center gap-3">
+                            <div class="w-8 h-8 rounded-md" style="background:${c.color}"></div>
+                            <span class="text-sm font-bold">${c.name}</span>
                         </div>
-                        <button onclick="${owned ? `setSkin('${id}')` : `buySkin('${id}', ${s.price})`}" class="w-full py-3 rounded-xl text-xs font-black ${active ? 'bg-emerald-500 text-slate-900' : 'bg-white/5'}">
-                            ${active ? 'مفعل' : (owned ? 'تفعيل' : 'شراء')}
+                        <button onclick="${owned ? `selectColor('${c.color}')` : `buyColor('${c.color}', ${c.price})`}"
+                                class="px-4 py-1.5 rounded-lg text-xs font-black ${active ? 'bg-emerald-500 text-slate-900' : 'bg-slate-700'}">
+                            ${active ? 'نشط' : (owned ? 'اختيار' : c.price + ' 💎')}
                         </button>
                     </div>
                 `;
             }).join('');
         }
 
-        function buySkin(id, price) {
-            if (state.gems >= price) {
-                state.gems -= price; state.ownedSkins.push(id); save(); renderShop(); updateUI();
-            }
+        function buyColor(color, price) {
+            if(state.gems >= price) {
+                state.gems -= price;
+                state.ownedColors.push(color);
+                state.activeColor = color;
+                save(); renderStats(); renderShop();
+            } else alert('الجواهر غير كافية!');
         }
 
-        function setSkin(id) { state.currentSkin = id; save(); renderShop(); }
+        function selectColor(color) {
+            state.activeColor = color;
+            save(); renderShop();
+        }
 
         function renderMissions() {
-            const list = document.getElementById('missions-list');
-            list.innerHTML = state.missions.map(m => `
-                <div class="glass p-6 rounded-[1.5rem] mission-item">
-                    <div class="flex justify-between items-center mb-3">
-                        <div>
-                            <h4 class="font-bold text-white">${m.title}</h4>
-                            <p class="text-[10px] text-slate-500">${m.desc}</p>
-                        </div>
-                        <div class="text-right">
-                            <p class="text-emerald-400 font-bold text-xs">+${m.reward} ج</p>
-                            <p class="text-[9px] text-slate-500">${m.progress}/${m.target}</p>
-                        </div>
-                    </div>
-                    ${m.claimed ? 
-                        `<span class="text-[10px] font-black text-slate-600 uppercase">تم الاستلام ✓</span>` : 
-                        (m.progress >= m.target ? 
-                            `<button onclick="claimMission(${m.id})" class="w-full py-2 bg-white text-black rounded-lg text-xs font-black">استلام الجائزة</button>` :
-                            `<div class="h-1 w-full bg-white/5 rounded-full"><div class="h-full bg-emerald-500 rounded-full" style="width:${(m.progress/m.target)*100}%"></div></div>`)
-                    }
+            const m = [
+                { t: 'الرقم القياسي 50+', ok: state.highScore >= 50 },
+                { t: 'جمع 100 جوهرة', ok: state.gems >= 100 },
+                { t: 'شراء لون جديد', ok: state.ownedColors.length > 1 }
+            ];
+            document.getElementById('mission-list').innerHTML = m.map(item => `
+                <div class="flex items-center justify-between opacity-${item.ok ? '100' : '50'}">
+                    <span class="text-[11px]">${item.t}</span>
+                    <i data-lucide="${item.ok ? 'check-circle' : 'circle'}" class="w-3 h-3 ${item.ok ? 'text-emerald-500' : ''}"></i>
                 </div>
             `).join('');
+            lucide.createIcons();
         }
 
-        function trackMission(id, val) {
-            const m = state.missions.find(m => m.id === id);
-            if (m && m.progress < m.target) {
-                m.progress = id === 2 ? Math.max(m.progress, val) : m.progress + val;
-                save();
-            }
+        window.onkeydown = (e) => {
+            if(e.key === 'ArrowUp') setDir(0, -1);
+            if(e.key === 'ArrowDown') setDir(0, 1);
+            if(e.key === 'ArrowLeft') setDir(-1, 0);
+            if(e.key === 'ArrowRight') setDir(1, 0);
+            if(e.code === 'Space' && !state.gameActive) startGame();
+        };
+
+        // Polyfill for roundRect
+        if (!CanvasRenderingContext2D.prototype.roundRect) {
+            CanvasRenderingContext2D.prototype.roundRect = function (x, y, w, h, r) {
+                if (w < 2 * r) r = w / 2; if (h < 2 * r) r = h / 2;
+                this.moveTo(x + r, y);
+                this.arcTo(x + w, y, x + w, y + h, r);
+                this.arcTo(x + w, y + h, x, y + h, r);
+                this.arcTo(x, y + h, x, y, r);
+                this.arcTo(x, y, x + w, y, r);
+                this.closePath(); return this;
+            };
         }
-
-        function claimMission(id) {
-            const m = state.missions.find(m => m.id === id);
-            if (m && !m.claimed && m.progress >= m.target) {
-                m.claimed = true; state.gems += m.reward; save(); renderMissions(); updateUI();
-            }
-        }
-
-        function save() {
-            localStorage.setItem('zen_snake_hs', state.highScore);
-            localStorage.setItem('zen_snake_gems', state.gems);
-            localStorage.setItem('zen_snake_skins', JSON.stringify(state.ownedSkins));
-            localStorage.setItem('zen_snake_active', state.currentSkin);
-        }
-
-        function setDirection(dir) {
-            if (dir === 'UP' && dy === 0) { dx = 0; dy = -1; }
-            if (dir === 'DOWN' && dy === 0) { dx = 0; dy = 1; }
-            if (dir === 'LEFT' && dx === 0) { dx = 1; dy = 0; }
-            if (dir === 'RIGHT' && dx === 0) { dx = -1; dy = 0; }
-        }
-
-        window.addEventListener('keydown', e => setDirection(e.key.replace('Arrow', '').toUpperCase()));
-        
-        // منع التمرير على الجوال
-        document.addEventListener('touchmove', function(e) { if(GAME_ON) e.preventDefault(); }, { passive: false });
-
     </script>
 </body>
 </html>
