@@ -3,640 +3,247 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SNAKE: COSMIC OVERDRIVE</title>
+    <title>ثعبان بسيط - النسخة الخفيفة</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@100;300;400;500;600;700;800;900&family=Space+Grotesk:wght@300;400;500;600;700&family=Outfit:wght@100;300;400;500;600;700;800;900&display=swap" rel="stylesheet">
     <style>
-        :root {
-            --neon-blue: #00f2ff;
-            --neon-purple: #bc13fe;
-            --neon-pink: #ff00ea;
-            --neon-green: #39ff14;
-            --font-display: "Outfit", sans-serif;
-            --font-sans: "Inter", sans-serif;
-            --bg-dark: #020205;
-        }
-
         body {
-            background-color: var(--bg-dark);
-            color: #fff;
-            font-family: var(--font-sans);
+            background-color: #0f172a; /* كحلي غامق مريح */
+            color: #f8fafc;
+            font-family: system-ui, -apple-system, sans-serif;
             overflow: hidden;
             margin: 0;
             user-select: none;
+            touch-action: none;
         }
 
-        /* --- High-End Visual Effects --- */
-        #main-bg {
-            position: fixed;
-            inset: 0;
-            z-index: -2;
-            background: radial-gradient(circle at 50% 50%, #0a0a1f 0%, #020205 100%);
-            transition: background 1.5s ease;
+        #game-canvas {
+            background-color: #1e293b;
+            border-radius: 1rem;
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.3);
+            max-width: 90vw;
+            max-height: 70vh;
         }
 
-        #bg-canvas {
-            position: fixed;
-            inset: 0;
-            z-index: -1;
-            opacity: 0.6;
-            pointer-events: none;
+        .stats-card {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 1rem 2rem;
+            border-radius: 0.75rem;
+            border: 1px solid rgba(255, 255, 255, 0.1);
         }
 
-        .glass-card {
-            background: rgba(255, 255, 255, 0.03);
-            backdrop-filter: blur(30px);
-            border: 1px solid rgba(255, 255, 255, 0.08);
-            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.8);
+        .btn-primary {
+            background-color: #38bdf8;
+            color: #0f172a;
+            font-weight: 800;
+            padding: 0.75rem 2.5rem;
+            border-radius: 0.5rem;
+            transition: all 0.2s;
         }
 
-        .neo-text {
-            background: linear-gradient(135deg, var(--neon-blue), var(--neon-purple), var(--neon-pink));
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-size: 300% 300%;
-            animation: flow 8s ease infinite;
+        .btn-primary:hover {
+            background-color: #7dd3fc;
+            transform: translateY(-2px);
         }
 
-        @keyframes flow {
-            0% { background-position: 0% 50%; }
-            50% { background-position: 100% 50%; }
-            100% { background-position: 0% 50%; }
+        .btn-primary:active {
+            transform: translateY(0);
         }
 
-        .hud-label {
-            font-size: 10px;
-            letter-spacing: 0.4em;
-            text-transform: uppercase;
-            color: rgba(255,255,255,0.4);
-            font-weight: 900;
-        }
-
-        /* --- Interactive Animations --- */
-        .screen-active {
-            opacity: 1;
-            transform: scale(1);
-            filter: blur(0);
-        }
-        .screen-hidden {
-            opacity: 0;
-            transform: scale(0.95);
-            filter: blur(10px);
-            pointer-events: none;
-        }
-
-        .shake { animation: shake 0.4s cubic-bezier(.36,.07,.19,.97) both; }
-        @keyframes shake {
-            10%, 90% { transform: translate3d(-1px, 0, 0); }
-            20%, 80% { transform: translate3d(2px, 0, 0); }
-            30%, 50%, 70% { transform: translate3d(-4px, 0, 0); }
-            40%, 60% { transform: translate3d(4px, 0, 0); }
-        }
-
-        .pulse-soft { animation: pulse 2s infinite; }
-        @keyframes pulse {
-            0% { transform: scale(1); opacity: 1; }
-            50% { transform: scale(1.05); opacity: 0.8; }
-            100% { transform: scale(1); opacity: 1; }
-        }
-
-        /* Custom Scrollbar */
-        .hide-scroll::-webkit-scrollbar { display: none; }
-        
-        .cursor-custom {
-            width: 20px;
-            height: 20px;
-            border: 2px solid var(--neon-blue);
-            border-radius: 50%;
-            position: fixed;
-            pointer-events: none;
-            z-index: 1000;
-            transition: transform 0.1s ease, border-color 0.3s ease;
-            mix-blend-mode: difference;
-        }
+        .hidden { display: none !important; }
     </style>
 </head>
-<body>
+<body class="flex flex-col items-center justify-center min-h-screen p-4">
 
-    <div id="cursor" class="cursor-custom"></div>
-    <div id="main-bg"></div>
-    <canvas id="bg-canvas"></canvas>
-
-    <div id="app" class="relative h-screen w-screen flex items-center justify-center overflow-hidden">
-        
-        <!-- Global HUD -->
-        <div id="global-hud" class="fixed top-0 inset-x-0 p-12 z-50 flex justify-between items-start transition-all duration-700 pointer-events-none">
-            <div class="flex gap-12 pointer-events-auto">
-                <div class="flex flex-col group">
-                    <span class="hud-label group-hover:text-cyan-400 transition-colors">السجل الأسطوري</span>
-                    <span id="best-score" class="text-5xl font-display font-black neo-text">0</span>
-                </div>
-                <div class="flex flex-col group">
-                    <span class="hud-label group-hover:text-purple-400 transition-colors">المخزون الرقمي</span>
-                    <div class="flex items-center gap-2">
-                        <i data-lucide="zap" class="w-6 h-6 text-purple-400"></i>
-                        <span id="user-coins" class="text-5xl font-display font-black text-white/90">0</span>
-                    </div>
-                </div>
-            </div>
-
-            <div class="flex items-center gap-6 pointer-events-auto">
-                <button onclick="UI.open('missions')" class="p-4 glass-card rounded-2xl group active:scale-95 transition-all relative">
-                    <i data-lucide="target" class="w-6 h-6 text-emerald-400 group-hover:rotate-12 transition-transform"></i>
-                    <div id="mission-dot" class="hidden absolute top-2 right-2 w-2 h-2 bg-red-500 rounded-full animate-pulse"></div>
-                </button>
-                <button onclick="UI.open('shop')" class="group flex items-center gap-4 px-8 py-4 glass-card rounded-[1.5rem] hover:bg-white/5 active:scale-95 transition-all">
-                    <i data-lucide="layers" class="w-5 h-5 text-cyan-400"></i>
-                    <span class="hud-label text-white/80 font-black">المتجر المتطور</span>
-                </button>
-            </div>
+    <!-- قائمة البداية -->
+    <div id="start-screen" class="flex flex-col items-center gap-6">
+        <h1 class="text-6xl font-black tracking-tight text-sky-400 mb-4">ثعبان</h1>
+        <div class="stats-card text-center">
+            <p class="text-sm text-slate-400 uppercase tracking-widest mb-1">أفضل نتيجة</p>
+            <p id="high-score" class="text-3xl font-bold">0</p>
         </div>
+        <button onclick="startGame()" class="btn-primary text-xl">ابدأ اللعب</button>
+    </div>
 
-        <!-- Start Screen -->
-        <div id="screen-start" class="absolute transition-all duration-700 flex flex-col items-center">
-            <div class="relative group mb-12">
-                <div class="absolute -inset-20 bg-cyan-500/10 blur-[120px] rounded-full group-hover:bg-purple-500/10 transition-colors duration-1000"></div>
-                <h1 class="text-[14rem] font-display font-black leading-none tracking-tighter neo-text select-none active:scale-95 transition-transform cursor-pointer">NEON</h1>
-                <div class="absolute -bottom-4 right-0 px-6 py-1 bg-white/10 backdrop-blur-md rounded-full border border-white/5">
-                    <span class="hud-label tracking-[0.8em] text-[8px]">OVERDRIVE ENGINE</span>
-                </div>
+    <!-- واجهة اللعـب -->
+    <div id="game-screen" class="hidden flex flex-col items-center gap-6 w-full">
+        <div class="flex gap-4 w-full max-w-[500px] justify-between">
+            <div class="stats-card flex-1 text-center">
+                <p class="text-xs text-slate-400">النقاط</p>
+                <p id="current-score" class="text-2xl font-bold">0</p>
             </div>
-
-            <div class="flex flex-col gap-10 items-center mt-12 w-full max-w-sm">
-                <button onclick="Game.start()" class="w-full relative py-10 rounded-[2.5rem] bg-white text-black overflow-hidden group hover:scale-105 active:scale-95 transition-all shadow-[0_20px_50px_-10px_rgba(255,255,255,0.4)]">
-                    <div class="absolute inset-0 bg-gradient-to-r from-cyan-400 via-purple-400 to-pink-400 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
-                    <span class="relative z-10 text-4xl font-display font-black flex items-center justify-center gap-4 group-hover:text-white transition-colors">
-                        دخول النظام <i data-lucide="arrow-left" class="w-8 h-8"></i>
-                    </span>
-                </button>
-            </div>
-        </div>
-
-        <!-- Game Interface -->
-        <div id="screen-game" class="absolute transition-all duration-1000 screen-hidden flex flex-col items-center justify-center">
-            <div id="game-hud" class="mb-12 flex flex-col items-center">
-                <span class="hud-label text-white/30">الإيقاع الحالي</span>
-                <div id="score-val" class="text-[10rem] font-display font-black neo-text leading-none">0</div>
-                <div id="multiplier" class="mt-4 px-4 py-1 rounded-full glass-card text-[10px] font-black tracking-widest text-cyan-400 opacity-0 transform translate-y-4 transition-all">COMBO X2</div>
-            </div>
-
-            <div id="canvas-wrap" class="relative group p-1.5 rounded-[3.5rem] bg-gradient-to-br from-white/10 to-transparent shadow-2xl transition-transform duration-500">
-                <div id="canvas-glow" class="absolute -inset-10 bg-cyan-500/10 blur-[80px] rounded-full opacity-0 transition-opacity duration-1000"></div>
-                <canvas id="game-canvas" width="600" height="600" class="rounded-[3.2rem] block"></canvas>
-            </div>
-            
-            <div class="mt-12 flex gap-12 text-white/20 font-black text-[9px] uppercase tracking-[0.4em]">
-                <div class="flex items-center gap-3"><i data-lucide="navigation" class="w-4 h-4"></i> التحكم عبر الأسهم</div>
-                <div class="flex items-center gap-3 active:text-cyan-400 transition-colors cursor-pointer" onclick="Game.togglePause()"><i data-lucide="pause" class="w-4 h-4"></i> مساحة التوقف</div>
-            </div>
-        </div>
-
-        <!-- Death Sequence -->
-        <div id="screen-over" class="absolute transition-all duration-700 screen-hidden flex flex-col items-center text-center">
-            <h2 class="text-9xl font-display font-black text-red-500 tracking-tighter mb-16 uppercase italic">Critical Failure.</h2>
-            <div class="flex gap-8 mb-16">
-                <div class="p-12 glass-card rounded-[3.5rem] min-w-[280px]">
-                    <span class="hud-label text-white/30 block mb-6">البيانات المحققة</span>
-                    <span id="final-score" class="text-8xl font-display font-black">0</span>
-                </div>
-                <div class="p-12 glass-card rounded-[3.5rem] min-w-[280px]">
-                    <span class="hud-label text-white/30 block mb-6">الأرباح المشفرة</span>
-                    <div class="flex items-center justify-center gap-4 text-purple-400">
-                        <i data-lucide="zap" class="w-8 h-8"></i>
-                        <span id="earned-coins" class="text-8xl font-display font-black">0</span>
-                    </div>
-                </div>
-            </div>
-            <button onclick="Game.start()" class="px-20 py-8 bg-white text-black rounded-full font-black text-3xl shadow-2xl hover:scale-105 active:scale-95 transition-all flex items-center gap-6">
-                إعادة المحاولة <i data-lucide="refresh-cw" class="w-8 h-8"></i>
+            <button onclick="resetGame()" class="p-4 bg-slate-800 rounded-xl hover:bg-slate-700 transition-colors">
+                <i data-lucide="rotate-ccw" class="w-6 h-6"></i>
             </button>
         </div>
+        
+        <canvas id="game-canvas"></canvas>
 
-        <!-- System Modals -->
-        <div id="modal-container" class="fixed inset-0 z-[100] hidden flex items-center justify-center p-8 backdrop-blur-3xl transition-opacity animate-in fade-in duration-500">
-            <div class="absolute inset-0 bg-black/80" onclick="UI.close()"></div>
-            <div id="modal-body" class="relative w-full max-w-5xl h-[85vh] bg-[#050510] border border-white/5 rounded-[4rem] flex flex-col overflow-hidden shadow-2xl">
-                <!-- Content Injected Dynamically -->
-            </div>
+        <div class="grid grid-cols-3 gap-2 mt-4 lg:hidden">
+            <div></div>
+            <button class="bg-slate-800 p-4 rounded-lg" onclick="setDirection('UP')"><i data-lucide="chevron-up"></i></button>
+            <div></div>
+            <button class="bg-slate-800 p-4 rounded-lg" onclick="setDirection('LEFT')"><i data-lucide="chevron-right"></i></button>
+            <button class="bg-slate-800 p-4 rounded-lg" onclick="setDirection('DOWN')"><i data-lucide="chevron-down"></i></button>
+            <button class="bg-slate-800 p-4 rounded-lg" onclick="setDirection('RIGHT')"><i data-lucide="chevron-left"></i></button>
         </div>
+        
+        <p class="hidden lg:block text-slate-500 text-sm mt-4">استخدم أسهم الكيبورد للتحكم</p>
+    </div>
 
+    <!-- شاشة النهاية -->
+    <div id="end-screen" class="hidden flex flex-col items-center gap-6">
+        <h2 class="text-5xl font-black text-red-400">انتهت اللعبة</h2>
+        <div class="stats-card text-center min-w-[200px]">
+            <p class="text-sm text-slate-400 mb-1">نقاطك</p>
+            <p id="final-score" class="text-4xl font-bold text-sky-400">0</p>
+        </div>
+        <button onclick="startGame()" class="btn-primary text-xl">حاول ثانية</button>
+        <button onclick="showStart()" class="text-slate-400 hover:text-white underline">العودة للرئيسية</button>
     </div>
 
     <script>
-        // --- High Density Config ---
-        const CONFIG = {
-            TILE_COUNT: 25,
-            BASE_SPEED: 140,
-            ACCEL: 0.98,
-            MIN_DELAY: 45,
-            PARTICLE_LIFETIME: 0.8,
-            COLOR_ARRAY: ['#00f2ff', '#bc13fe', '#ff00ea', '#39ff14', '#ffff00']
-        };
+        const canvas = document.getElementById('game-canvas');
+        const ctx = canvas.getContext('2d');
+        
+        const GRID_SIZE = 20;
+        let TILE_COUNT = 20;
+        let snake = [];
+        let food = { x: 5, y: 5 };
+        let dx = 0;
+        let dy = 0;
+        let score = 0;
+        let gameLoop;
+        let highScore = localStorage.getItem('snake_simple_hs') || 0;
 
-        // --- Core Application State ---
-        let DATA = {
-            best: 0,
-            gems: 0,
-            ownedSkins: ['cyan'],
-            activeSkin: 'cyan',
-            ownedWorlds: ['space'],
-            activeWorld: 'space',
-            upgrades: { magnet: 0, shield: 0, time: 0 },
-            rating: 0,
-            missions: []
-        };
+        document.getElementById('high-score').innerText = highScore;
 
-        let GAME = {
-            running: false,
-            paused: false,
-            score: 0,
-            snake: [],
-            food: {x: 5, y: 5},
-            dir: 'RIGHT',
-            nextDir: 'RIGHT',
-            lastTick: 0,
-            particles: [],
-            combo: 0,
-            comboTimer: 0,
-            speed: CONFIG.BASE_SPEED
-        };
+        function initCanvas() {
+            const size = Math.min(window.innerWidth - 40, 500);
+            canvas.width = size;
+            canvas.height = size;
+            TILE_COUNT = Math.floor(canvas.width / GRID_SIZE);
+        }
 
-        const SKINS = {
-            cyan: { name: 'بروتوكول سايان', color: '#00f2ff', glow: '#00f2ff', price: 0, type: 'rect' },
-            plasma: { name: 'بلازما البنفسج', color: '#bc13fe', glow: '#bc13fe', price: 2000, type: 'rounded' },
-            inferno: { name: 'جحيم الغروب', grad: ['#ff00ea', '#ff4d00'], glow: '#ff00ea', price: 5000, type: 'circle' },
-            matrix: { name: 'شفرة الحقيقة', color: '#39ff14', glow: '#39ff14', price: 12000, type: 'ghost', animated: true },
-            cosmic: { name: 'نبض النجوم', animated: true, glow: '#ffffff', price: 25000, type: 'diamond' }
-        };
+        function startGame() {
+            initCanvas();
+            document.getElementById('start-screen').classList.add('hidden');
+            document.getElementById('end-screen').classList.add('hidden');
+            document.getElementById('game-screen').classList.remove('hidden');
+            
+            snake = [
+                { x: 10, y: 10 },
+                { x: 10, y: 11 },
+                { x: 10, y: 12 }
+            ];
+            dx = 0;
+            dy = -1;
+            score = 0;
+            document.getElementById('current-score').innerText = score;
+            
+            clearInterval(gameLoop);
+            gameLoop = setInterval(update, 100);
+            placeFood();
+            lucide.createIcons();
+        }
 
-        // --- Core Engine Modules ---
-        const Renderer = {
-            canvas: null,
-            ctx: null,
-            bgCanvas: null,
-            bgCtx: null,
-            stars: [],
+        function update() {
+            const head = { x: snake[0].x + dx, y: snake[0].y + dy };
 
-            init() {
-                this.canvas = document.getElementById('game-canvas');
-                this.ctx = this.canvas.getContext('2d');
-                this.bgCanvas = document.getElementById('bg-canvas');
-                this.bgCtx = this.bgCanvas.getContext('2d');
-                this.resize();
-                this.initStars();
-                this.loopBG();
-                window.addEventListener('resize', () => this.resize());
-            },
-
-            resize() {
-                this.bgCanvas.width = window.innerWidth;
-                this.bgCanvas.height = window.innerHeight;
-            },
-
-            initStars() {
-                for(let i=0; i<80; i++) {
-                    this.stars.push({
-                        x: Math.random() * innerWidth,
-                        y: Math.random() * innerHeight,
-                        size: Math.random() * 2,
-                        speed: Math.random() * 0.5 + 0.1,
-                        opacity: Math.random()
-                    });
-                }
-            },
-
-            loopBG() {
-                this.bgCtx.clearRect(0,0, innerWidth, innerHeight);
-                this.stars.forEach(s => {
-                    s.y += s.speed;
-                    if(s.y > innerHeight) s.y = 0;
-                    this.bgCtx.fillStyle = `rgba(255,255,255,${s.opacity})`;
-                    this.bgCtx.beginPath();
-                    this.bgCtx.arc(s.x, s.y, s.size, 0, Math.PI*2);
-                    this.bgCtx.fill();
-                });
-                requestAnimationFrame(() => this.loopBG());
-            },
-
-            draw() {
-                const size = this.canvas.width / CONFIG.TILE_COUNT;
-                this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
-
-                // Subtle Grid
-                this.ctx.strokeStyle = 'rgba(255,255,255,0.03)';
-                this.ctx.lineWidth = 1;
-                for(let i=0; i<CONFIG.TILE_COUNT; i++){
-                    this.ctx.beginPath(); this.ctx.moveTo(i*size, 0); this.ctx.lineTo(i*size, this.canvas.height); this.ctx.stroke();
-                    this.ctx.beginPath(); this.ctx.moveTo(0, i*size); this.ctx.lineTo(this.canvas.width, i*size); this.ctx.stroke();
-                }
-
-                // Food with Glow
-                const pulse = Math.sin(Date.now() / 200) * 4;
-                this.ctx.shadowBlur = 40 + pulse;
-                this.ctx.shadowColor = '#fff';
-                this.ctx.fillStyle = '#fff';
-                this.ctx.beginPath();
-                this.ctx.arc(GAME.food.x * size + size/2, GAME.food.y * size + size/2, size/3 + pulse/10, 0, Math.PI*2);
-                this.ctx.fill();
-
-                // Advanced Snake Rendering
-                const skin = SKINS[DATA.activeSkin];
-                GAME.snake.forEach((seg, i) => {
-                    const isHead = i === 0;
-                    this.ctx.save();
-                    this.ctx.translate(seg.x * size + size/2, seg.y * size + size/2);
-                    
-                    this.ctx.shadowBlur = isHead ? 45 : 15;
-                    this.ctx.shadowColor = skin.glow;
-                    
-                    if(skin.animated) {
-                        this.ctx.fillStyle = `hsl(${(Date.now()/10 + i * 15)%360}, 80%, 65%)`;
-                    } else if(skin.grad) {
-                        const g = this.ctx.createLinearGradient(-size/2, -size/2, size/2, size/2);
-                        skin.grad.forEach((c, idx) => g.addColorStop(idx/(skin.grad.length-1), c));
-                        this.ctx.fillStyle = g;
-                    } else {
-                        this.ctx.fillStyle = skin.color;
-                    }
-
-                    const r = isHead ? size/2 - 1 : size/2 - 3;
-                    this.ctx.globalAlpha = skin.type === 'ghost' ? 0.4 + Math.sin(Date.now()/300)*0.2 : 1;
-
-                    if(skin.type === 'circle') { this.ctx.beginPath(); this.ctx.arc(0,0,r,0,Math.PI*2); this.ctx.fill(); }
-                    else if(skin.type === 'diamond') { this.ctx.rotate(Math.PI/4); this.ctx.fillRect(-r, -r, r*2, r*2); }
-                    else { 
-                        const rad = isHead ? 14 : 8;
-                        this.ctx.beginPath();
-                        this.ctx.roundRect(-r, -r, r*2, r*2, rad);
-                        this.ctx.fill();
-                    }
-
-                    if(isHead) {
-                        this.ctx.shadowBlur = 0;
-                        this.ctx.fillStyle = '#000';
-                        this.ctx.beginPath(); 
-                        this.ctx.arc(-r/3, -r/3, 2.5, 0, Math.PI*2); 
-                        this.ctx.arc(r/3, -r/3, 2.5, 0, Math.PI*2);
-                        this.ctx.fill();
-                    }
-                    this.ctx.restore();
-                });
-
-                // Particles
-                GAME.particles.forEach((p, i) => {
-                    p.x += p.vx; p.y += p.vy; p.alpha -= 0.02;
-                    if(p.alpha <= 0) GAME.particles.splice(i, 1);
-                    else {
-                        this.ctx.globalAlpha = p.alpha;
-                        this.ctx.fillStyle = p.color;
-                        this.ctx.beginPath(); this.ctx.arc(p.x, p.y, p.r, 0, Math.PI*2); this.ctx.fill();
-                    }
-                });
-                this.ctx.globalAlpha = 1;
-            },
-
-            burst(x, y, color) {
-                const px = x * (this.canvas.width / CONFIG.TILE_COUNT) + 15;
-                const py = y * (this.canvas.width / CONFIG.TILE_COUNT) + 15;
-                for(let i=0; i<30; i++) {
-                    GAME.particles.push({
-                        x: px, y: py,
-                        vx: (Math.random()-0.5)*15,
-                        vy: (Math.random()-0.5)*15,
-                        r: Math.random()*4 + 1,
-                        alpha: 1,
-                        color: color
-                    });
-                }
+            // تصادم مع الجدران
+            if (head.x < 0 || head.x >= TILE_COUNT || head.y < 0 || head.y >= TILE_COUNT) {
+                return gameOver();
             }
-        };
 
-        // --- Gameplay Controller ---
-        const Game = {
-            start() {
-                UI.changeScreen('game');
-                GAME.running = true;
-                GAME.paused = false;
-                GAME.score = 0;
-                GAME.speed = CONFIG.BASE_SPEED;
-                GAME.snake = [{x: 12, y: 12}, {x: 12, y: 13}, {x: 12, y: 14}];
-                GAME.dir = 'UP';
-                GAME.nextDir = 'UP';
-                GAME.particles = [];
-                this.placeFood();
-                this.loop();
-                
-                document.getElementById('score-val').innerText = '0';
-                document.getElementById('canvas-wrap').style.transform = 'scale(1)';
-                document.getElementById('canvas-glow').style.opacity = '1';
-                lucide.createIcons();
-            },
-
-            loop(time) {
-                if(!GAME.running || GAME.paused) return;
-                
-                const delta = time - GAME.lastTick;
-                if(delta > GAME.speed) {
-                    this.move();
-                    GAME.lastTick = time;
-                }
-                
-                Renderer.draw();
-                requestAnimationFrame((t) => this.loop(t));
-            },
-
-            move() {
-                GAME.dir = GAME.nextDir;
-                const head = { ...GAME.snake[0] };
-
-                if(GAME.dir === 'UP') head.y--;
-                if(GAME.dir === 'DOWN') head.y++;
-                if(GAME.dir === 'LEFT') head.x--;
-                if(GAME.dir === 'RIGHT') head.x++;
-
-                // Collision
-                if(head.x < 0 || head.x >= CONFIG.TILE_COUNT || head.y < 0 || head.y >= CONFIG.TILE_COUNT ||
-                   GAME.snake.some(s => s.x === head.x && s.y === head.y)) {
-                    return this.over();
-                }
-
-                GAME.snake.unshift(head);
-
-                // Magnetic Powerup Support
-                if(DATA.upgrades.magnet > 0) {
-                    const dist = Math.hypot(head.x - GAME.food.x, head.y - GAME.food.y);
-                    if(dist < 2 + DATA.upgrades.magnet) {
-                        if(GAME.food.x < head.x) GAME.food.x++; else if(GAME.food.x > head.x) GAME.food.x--;
-                        if(GAME.food.y < head.y) GAME.food.y++; else if(GAME.food.y > head.y) GAME.food.y--;
-                    }
-                }
-
-                if(head.x === GAME.food.x && head.y === GAME.food.y) {
-                    this.eat();
-                } else {
-                    GAME.snake.pop();
-                }
-            },
-
-            eat() {
-                GAME.score++;
-                GAME.speed = Math.max(CONFIG.MIN_DELAY, GAME.speed * CONFIG.ACCEL);
-                document.getElementById('score-val').innerText = GAME.score;
-                Renderer.burst(GAME.food.x, GAME.food.y, CONFIG.COLOR_ARRAY[Math.floor(Math.random()*CONFIG.COLOR_ARRAY.length)]);
-                this.placeFood();
-                
-                // Screen Shake Logic
-                const wrap = document.getElementById('canvas-wrap');
-                wrap.classList.add('shake');
-                setTimeout(() => wrap.classList.remove('shake'), 400);
-
-                // Combo Display
-                const mult = document.getElementById('multiplier');
-                mult.style.opacity = '1'; mult.style.transform = 'translateY(0)';
-                clearTimeout(this.multTimer);
-                this.multTimer = setTimeout(() => { mult.style.opacity = '0'; mult.style.transform = 'translateY(20px)'; }, 1500);
-            },
-
-            placeFood() {
-                GAME.food = { x: Math.floor(Math.random()*CONFIG.TILE_COUNT), y: Math.floor(Math.random()*CONFIG.TILE_COUNT) };
-                if(GAME.snake.some(s => s.x === GAME.food.x && s.y === GAME.food.y)) this.placeFood();
-            },
-
-            over() {
-                GAME.running = false;
-                const earned = Math.floor(GAME.score * 2.5);
-                DATA.gems += earned;
-                if(GAME.score > DATA.best) DATA.best = GAME.score;
-                
-                document.getElementById('final-score').innerText = GAME.score;
-                document.getElementById('earned-coins').innerText = '+' + earned;
-                
-                UI.save();
-                UI.changeScreen('over');
-                document.getElementById('canvas-glow').style.opacity = '0';
-            },
-
-            togglePause() {
-                GAME.paused = !GAME.paused;
-                if(!GAME.paused) this.loop(performance.now());
+            // تصادم مع النفس
+            if (snake.some(segment => segment.x === head.x && segment.y === head.y)) {
+                return gameOver();
             }
-        };
 
-        // --- Interface Logic ---
-        const UI = {
-            changeScreen(id) {
-                ['start', 'game', 'over'].forEach(s => {
-                    const el = document.getElementById('screen-'+s);
-                    if(s === id) { el.classList.remove('screen-hidden'); el.classList.add('screen-active'); }
-                    else { el.classList.remove('screen-active'); el.classList.add('screen-hidden'); }
-                });
-            },
+            snake.unshift(head);
 
-            open(type) {
-                const modal = document.getElementById('modal-container');
-                const body = document.getElementById('modal-body');
-                modal.classList.remove('hidden');
-                
-                if(type === 'shop') this.renderShop();
-                if(type === 'missions') this.renderMissions();
-            },
-
-            close() { document.getElementById('modal-container').classList.add('hidden'); },
-
-            save() {
-                localStorage.setItem('neon_snake_v4', JSON.stringify(DATA));
-                this.updateHUD();
-            },
-
-            load() {
-                const saved = localStorage.getItem('neon_snake_v4');
-                if(saved) Object.assign(DATA, JSON.parse(saved));
-                this.updateHUD();
-                Renderer.init();
-            },
-
-            updateHUD() {
-                document.getElementById('best-score').innerText = DATA.best;
-                document.getElementById('user-coins').innerText = Math.floor(DATA.gems);
-            },
-
-            renderShop() {
-                const body = document.getElementById('modal-body');
-                body.innerHTML = `
-                    <div class="p-16 flex flex-col h-full">
-                        <div class="flex justify-between items-center mb-16">
-                            <h2 class="text-6xl font-display font-black neo-text">المتجر المتطور</h2>
-                            <button onclick="UI.close()" class="p-4 rounded-full glass-card text-white/50 hover:text-white transition-colors"><i data-lucide="x"></i></button>
-                        </div>
-                        <div class="grid grid-cols-2 gap-10 flex-1 overflow-y-auto hide-scroll p-4">
-                            ${Object.entries(SKINS).map(([id, s]) => {
-                                const active = DATA.activeSkin === id;
-                                const owned = DATA.ownedSkins.includes(id);
-                                return `
-                                    <div class="p-10 rounded-[3.5rem] glass-card ${active?'border-cyan-500/50 bg-cyan-500/5':''} flex flex-col items-center group transition-all">
-                                        <div class="w-32 h-32 rounded-[2.5rem] mb-8 luxury-blur flex items-center justify-center group-hover:scale-110 transition-transform shadow-2xl">
-                                            <div class="w-16 h-16" style="background:${s.grad?`linear-gradient(45deg,${s.grad[0]},${s.grad[1]})`:s.color}; border-radius:${s.type==='circle'?'50%':(s.type==='diamond'?'12px':'6px')}; transform:${s.type==='diamond'?'rotate(45deg)':'none'}; box-shadow: 0 0 30px ${s.glow}88"></div>
-                                        </div>
-                                        <h3 class="text-3xl font-display font-black mb-2">${s.name}</h3>
-                                        <p class="text-[10px] hud-label mb-10">${owned ? 'المعدات ممتلكة' : s.price + ' جوهرة'}</p>
-                                        <button onclick="${owned?`UI.selectSkin('${id}')`:`UI.buySkin('${id}',${s.price})`}" class="w-full py-6 rounded-3xl font-black transition-all ${active?'bg-cyan-500 text-black':(owned?'bg-white/10 text-white':'bg-white text-black')} shadow-xl">
-                                            ${active ? 'المسار النشط' : (owned ? 'تفعيل' : 'تشفير')}
-                                        </button>
-                                    </div>
-                                `;
-                            }).join('')}
-                        </div>
-                    </div>
-                `;
-                lucide.createIcons();
-            },
-
-            selectSkin(id) { DATA.activeSkin = id; this.save(); this.renderShop(); },
-            buySkin(id, p) { if(DATA.gems >= p) { DATA.gems -= p; DATA.ownedSkins.push(id); this.save(); this.renderShop(); } },
-
-            renderMissions() {
-                const body = document.getElementById('modal-body');
-                body.innerHTML = `
-                   <div class="p-16 flex flex-col h-full">
-                        <div class="flex justify-between items-center mb-16">
-                            <h2 class="text-6xl font-display font-black italic">لوحة المهام</h2>
-                             <button onclick="UI.close()" class="p-4 rounded-full glass-card text-white/50 hover:text-white transition-colors"><i data-lucide="x"></i></button>
-                        </div>
-                        <div class="space-y-8 flex-1 overflow-y-auto">
-                            <div class="p-12 glass-card rounded-[4rem] border-emerald-500/20 bg-emerald-500/5">
-                                <div class="flex justify-between items-center mb-6">
-                                    <h4 class="text-3xl font-display font-black">تحطيم السجل</h4>
-                                    <span class="hud-label text-emerald-400">مكافأة: 5000</span>
-                                </div>
-                                <p class="text-white/40 mb-10 text-sm">حقق نتيجة تتجاوز 50 لتفعيل هذا البروتوكول.</p>
-                                <div class="w-full h-2 bg-white/5 rounded-full"><div class="h-full bg-emerald-500 rounded-full" style="width: ${Math.min(100, (DATA.best/50)*100)}%"></div></div>
-                            </div>
-                        </div>
-                   </div>
-                `;
-                lucide.createIcons();
+            // أكل الطعام
+            if (head.x === food.x && head.y === food.y) {
+                score += 10;
+                document.getElementById('current-score').innerText = score;
+                placeFood();
+            } else {
+                snake.pop();
             }
-        };
 
-        // --- Interaction Handlers ---
+            draw();
+        }
+
+        function draw() {
+            const size = canvas.width / TILE_COUNT;
+            
+            // خلفية
+            ctx.fillStyle = '#1e293b';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            // الطعام
+            ctx.fillStyle = '#f43f5e'; // أحمر وردي للطعام
+            ctx.beginPath();
+            ctx.roundRect(food.x * size + 2, food.y * size + 2, size - 4, size - 4, 4);
+            ctx.fill();
+
+            // الثعبان
+            snake.forEach((segment, index) => {
+                ctx.fillStyle = index === 0 ? '#38bdf8' : '#0ea5e9'; // رأس أفتح وجسم أغمق
+                ctx.beginPath();
+                ctx.roundRect(segment.x * size + 1, segment.y * size + 1, size - 2, size - 2, 4);
+                ctx.fill();
+            });
+        }
+
+        function placeFood() {
+            food = {
+                x: Math.floor(Math.random() * TILE_COUNT),
+                y: Math.floor(Math.random() * TILE_COUNT)
+            };
+            // التأكد أن الطعام لا يظهر فوق الثعبان
+            if (snake.some(s => s.x === food.x && s.y === food.y)) placeFood();
+        }
+
+        function gameOver() {
+            clearInterval(gameLoop);
+            document.getElementById('game-screen').classList.add('hidden');
+            document.getElementById('end-screen').classList.remove('hidden');
+            document.getElementById('final-score').innerText = score;
+            
+            if (score > highScore) {
+                highScore = score;
+                localStorage.setItem('snake_simple_hs', highScore);
+                document.getElementById('high-score').innerText = highScore;
+            }
+        }
+
+        function showStart() {
+            document.getElementById('end-screen').classList.add('hidden');
+            document.getElementById('start-screen').classList.remove('hidden');
+        }
+
+        function resetGame() {
+            clearInterval(gameLoop);
+            startGame();
+        }
+
+        function setDirection(dir) {
+            if (dir === 'UP' && dy === 0) { dx = 0; dy = -1; }
+            if (dir === 'DOWN' && dy === 0) { dx = 0; dy = 1; }
+            if (dir === 'LEFT' && dx === 0) { dx = 1; dy = 0; } // العكس بسبب RTL
+            if (dir === 'RIGHT' && dx === 0) { dx = -1; dy = 0; }
+        }
+
         window.addEventListener('keydown', e => {
-            if(!GAME.running) return;
-            if(e.key === 'ArrowUp' && GAME.dir !== 'DOWN') GAME.nextDir = 'UP';
-            if(e.key === 'ArrowDown' && GAME.dir !== 'UP') GAME.nextDir = 'DOWN';
-            if(e.key === 'ArrowLeft' && GAME.dir !== 'RIGHT') GAME.nextDir = 'LEFT';
-            if(e.key === 'ArrowRight' && GAME.dir !== 'LEFT') GAME.nextDir = 'RIGHT';
+            if (e.key === 'ArrowUp' && dy === 0) { dx = 0; dy = -1; }
+            if (e.key === 'ArrowDown' && dy === 0) { dx = 0; dy = 1; }
+            if (e.key === 'ArrowRight' && dx === 0) { dx = 1; dy = 0; }
+            if (e.key === 'ArrowLeft' && dx === 0) { dx = -1; dy = 0; }
         });
 
-        window.addEventListener('mousemove', (e) => {
-            const cursor = document.getElementById('cursor');
-            cursor.style.left = e.clientX - 10 + 'px';
-            cursor.style.top = e.clientY - 10 + 'px';
-        });
-
-        UI.load();
+        lucide.createIcons();
     </script>
 </body>
 </html>
-</body>
-</html>
+
