@@ -1,334 +1,1980 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>🐍 بايثون بالعربي — أكاديمية الاحتراف</title>
-    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700;900&family=Fira+Code:wght@400;500;600&display=swap" rel="stylesheet">
-    <style>
-        :root {
-            /* لوحة ألوان محسنة - Cyber Python Theme */
-            --bg-deep: #05070a;
-            --bg-card: #0f141d;
-            --bg-sidebar: #0a0f16;
-            --border: #1e293b;
-            --accent-blue: #3776ab; /* لون بايثون الرسمي */
-            --accent-yellow: #ffd43b; /* لون بايثون الثاني */
-            --accent-green: #4ade80;
-            --accent-pink: #f472b6;
-            --text-main: #f1f5f9;
-            --text-muted: #94a3b8;
-            --code-bg: #010409;
-            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-        }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>🐍 تعلم بايثون — من الصفر إلى الاحتراف</title>
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700;900&family=Fira+Code:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #0d1117;
+  --bg2: #161b22;
+  --bg3: #1c2128;
+  --card: #21262d;
+  --border: #30363d;
+  --accent: #f7c948;
+  --accent2: #58a6ff;
+  --accent3: #3fb950;
+  --accent4: #ff7b72;
+  --accent5: #d2a8ff;
+  --text: #e6edf3;
+  --text2: #8b949e;
+  --text3: #c9d1d9;
+  --code-bg: #0d1117;
+  --snake: #3fb950;
+}
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-        html { scroll-behavior: smooth; }
+html { scroll-behavior: smooth; }
 
-        body {
-            font-family: 'Cairo', sans-serif;
-            background: var(--bg-deep);
-            color: var(--text-main);
-            line-height: 1.7;
-            overflow-x: hidden;
-        }
+body {
+  font-family: 'Cairo', sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  line-height: 1.8;
+  overflow-x: hidden;
+}
 
-        /* ── التحسينات الجمالية ── */
-        ::-webkit-scrollbar { width: 8px; }
-        ::-webkit-scrollbar-track { background: var(--bg-deep); }
-        ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 10px; }
-        ::-webkit-scrollbar-thumb:hover { background: var(--accent-blue); }
+/* ── SCROLLBAR ── */
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: var(--bg); }
+::-webkit-scrollbar-thumb { background: var(--accent); border-radius: 3px; }
 
-        /* ── القائمة الجانبية ── */
-        #sidebar {
-            position: fixed;
-            top: 0; right: 0;
-            width: 280px;
-            height: 100vh;
-            background: var(--bg-sidebar);
-            border-left: 1px solid var(--border);
-            overflow-y: auto;
-            z-index: 1000;
-            padding: 20px 0;
-            transition: var(--transition);
-        }
+/* ── SIDEBAR ── */
+#sidebar {
+  position: fixed;
+  top: 0; right: 0;
+  width: 270px;
+  height: 100vh;
+  background: var(--bg2);
+  border-left: 1px solid var(--border);
+  overflow-y: auto;
+  z-index: 100;
+  padding: 20px 0;
+  transition: transform 0.3s ease;
+}
+#sidebar-logo {
+  padding: 0 20px 20px;
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 10px;
+}
+#sidebar-logo h2 { font-size: 1.1rem; color: var(--accent); font-weight: 900; }
+#sidebar-logo p { font-size: 0.75rem; color: var(--text2); }
 
-        #sidebar-logo {
-            padding: 0 25px 25px;
-            border-bottom: 1px solid var(--border);
-            margin-bottom: 20px;
-        }
+.sidebar-section { margin: 8px 0; }
+.sidebar-section-title {
+  font-size: 0.7rem;
+  color: var(--text2);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  padding: 8px 20px 4px;
+}
+.sidebar-link {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 7px 20px;
+  color: var(--text3);
+  text-decoration: none;
+  font-size: 0.85rem;
+  transition: all 0.2s;
+  border-right: 3px solid transparent;
+}
+.sidebar-link:hover, .sidebar-link.active {
+  background: rgba(247,201,72,0.08);
+  color: var(--accent);
+  border-right-color: var(--accent);
+}
+.sidebar-link .icon { font-size: 0.9rem; opacity: 0.7; }
 
-        #sidebar-logo h2 { 
-            font-size: 1.3rem; 
-            background: linear-gradient(90deg, var(--accent-blue), var(--accent-yellow));
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            font-weight: 900; 
-        }
+/* ── MAIN ── */
+#main {
+  margin-right: 270px;
+  min-height: 100vh;
+  padding: 0 0 60px;
+}
 
-        .sidebar-section-title {
-            font-size: 0.75rem;
-            color: var(--accent-blue);
-            text-transform: uppercase;
-            letter-spacing: 1.5px;
-            padding: 15px 25px 5px;
-            font-weight: 700;
-        }
+/* ── HERO ── */
+#hero {
+  background: linear-gradient(135deg, #0d1117 0%, #161b22 40%, #0d2136 100%);
+  padding: 80px 60px;
+  border-bottom: 1px solid var(--border);
+  position: relative;
+  overflow: hidden;
+}
+#hero::before {
+  content: '';
+  position: absolute;
+  top: -50%; left: -20%;
+  width: 600px; height: 600px;
+  background: radial-gradient(circle, rgba(247,201,72,0.06) 0%, transparent 70%);
+  pointer-events: none;
+}
+.hero-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(63,185,80,0.1);
+  border: 1px solid rgba(63,185,80,0.3);
+  color: var(--accent3);
+  padding: 6px 14px;
+  border-radius: 20px;
+  font-size: 0.8rem;
+  margin-bottom: 20px;
+}
+#hero h1 {
+  font-size: 3.2rem;
+  font-weight: 900;
+  line-height: 1.2;
+  margin-bottom: 16px;
+}
+#hero h1 span { color: var(--accent); }
+#hero p {
+  font-size: 1.1rem;
+  color: var(--text2);
+  max-width: 600px;
+  margin-bottom: 32px;
+}
+.hero-stats {
+  display: flex;
+  gap: 40px;
+  flex-wrap: wrap;
+}
+.stat { text-align: center; }
+.stat-num { font-size: 2rem; font-weight: 900; color: var(--accent); }
+.stat-label { font-size: 0.8rem; color: var(--text2); }
 
-        .sidebar-link {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            padding: 10px 25px;
-            color: var(--text-muted);
-            text-decoration: none;
-            font-size: 0.9rem;
-            transition: var(--transition);
-            border-right: 4px solid transparent;
-        }
+/* ── PROGRESS BAR ── */
+#progress-bar {
+  position: fixed;
+  top: 0; left: 0;
+  height: 3px;
+  background: var(--accent);
+  z-index: 999;
+  transition: width 0.1s;
+}
 
-        .sidebar-link:hover {
-            background: rgba(55, 118, 171, 0.1);
-            color: var(--text-main);
-            border-right-color: var(--accent-blue);
-        }
+/* ── SECTIONS ── */
+.section {
+  padding: 60px 60px 40px;
+  border-bottom: 1px solid var(--border);
+}
+.section:last-child { border-bottom: none; }
 
-        /* ── المحتوى الرئيسي ── */
-        #main { margin-right: 280px; padding-bottom: 100px; }
+.section-header {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 32px;
+}
+.section-num {
+  width: 44px; height: 44px;
+  background: var(--accent);
+  color: var(--bg);
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 900;
+  font-size: 1rem;
+  flex-shrink: 0;
+}
+.section-header h2 {
+  font-size: 1.8rem;
+  font-weight: 900;
+}
+.section-header h2 small {
+  display: block;
+  font-size: 0.85rem;
+  color: var(--text2);
+  font-weight: 400;
+}
 
-        #hero {
-            padding: 120px 60px;
-            background: radial-gradient(circle at top left, rgba(55, 118, 171, 0.15), transparent),
-                        radial-gradient(circle at bottom right, rgba(255, 212, 59, 0.05), transparent);
-            border-bottom: 1px solid var(--border);
-            text-align: center;
-        }
+/* ── CONTENT ── */
+.content-block { margin-bottom: 28px; }
+.content-block h3 {
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: var(--accent2);
+  margin-bottom: 10px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.content-block p { color: var(--text3); margin-bottom: 12px; }
 
-        #hero h1 { font-size: 3.5rem; font-weight: 900; margin-bottom: 20px; }
-        #hero h1 span { color: var(--accent-yellow); }
-        #hero p { color: var(--text-muted); font-size: 1.2rem; max-width: 800px; margin: 0 auto 40px; }
+/* ── CODE BLOCK ── */
+.code-wrap {
+  background: var(--code-bg);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  overflow: hidden;
+  margin: 12px 0 20px;
+}
+.code-header {
+  background: var(--bg3);
+  padding: 8px 16px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px solid var(--border);
+}
+.code-dots { display: flex; gap: 6px; }
+.code-dot {
+  width: 10px; height: 10px;
+  border-radius: 50%;
+}
+.dot-r { background: #ff5f57; }
+.dot-y { background: #febc2e; }
+.dot-g { background: #28c840; }
+.code-lang {
+  font-size: 0.7rem;
+  color: var(--text2);
+  font-family: 'Fira Code', monospace;
+}
+.copy-btn {
+  background: transparent;
+  border: 1px solid var(--border);
+  color: var(--text2);
+  padding: 3px 10px;
+  border-radius: 5px;
+  font-size: 0.7rem;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-family: 'Cairo', sans-serif;
+}
+.copy-btn:hover { border-color: var(--accent); color: var(--accent); }
+.code-content {
+  padding: 20px;
+  overflow-x: auto;
+  direction: ltr;
+  text-align: left;
+}
+pre {
+  font-family: 'Fira Code', monospace;
+  font-size: 0.88rem;
+  line-height: 1.7;
+  color: #e6edf3;
+}
 
-        /* ── الأقسام ── */
-        .section { padding: 80px 60px; border-bottom: 1px solid var(--border); max-width: 1100px; margin: 0 auto; }
-        
-        .section-header { display: flex; align-items: center; gap: 20px; margin-bottom: 40px; }
-        .section-num {
-            background: var(--accent-blue);
-            color: white;
-            width: 50px; height: 50px;
-            border-radius: 12px;
-            display: flex; align-items: center; justify-content: center;
-            font-weight: 900; font-size: 1.2rem;
-            box-shadow: 0 4px 15px rgba(55, 118, 171, 0.3);
-        }
+/* Syntax highlighting */
+.kw { color: #ff7b72; }      /* keywords */
+.fn { color: #d2a8ff; }      /* functions */
+.st { color: #a5d6ff; }      /* strings */
+.cm { color: #8b949e; font-style: italic; } /* comments */
+.nb { color: #f0883e; }      /* numbers */
+.op { color: #ff7b72; }      /* operators */
+.cl { color: #ffa657; }      /* class names */
+.bi { color: #79c0ff; }      /* built-in */
 
-        .content-block h3 { color: var(--accent-yellow); margin: 30px 0 15px; display: flex; align-items: center; gap: 10px; }
-        
-        /* ── كتل الكود ── */
-        .code-wrap {
-            background: var(--code-bg);
-            border: 1px solid var(--border);
-            border-radius: 15px;
-            margin: 25px 0;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-            overflow: hidden;
-        }
+/* ── OUTPUT BLOCK ── */
+.output-block {
+  background: #0a0c10;
+  border: 1px solid #30363d;
+  border-top: none;
+  padding: 14px 20px;
+  font-family: 'Fira Code', monospace;
+  font-size: 0.82rem;
+  color: var(--accent3);
+  direction: ltr;
+  text-align: left;
+  border-radius: 0 0 12px 12px;
+}
+.output-label {
+  color: var(--text2);
+  font-size: 0.7rem;
+  margin-bottom: 6px;
+}
 
-        .code-header {
-            background: #161b22;
-            padding: 12px 20px;
-            display: flex; justify-content: space-between; align-items: center;
-            border-bottom: 1px solid var(--border);
-        }
+/* ── TIPS ── */
+.tip-box {
+  border-radius: 10px;
+  padding: 16px 20px;
+  margin: 16px 0;
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+}
+.tip-box.info { background: rgba(88,166,255,0.08); border: 1px solid rgba(88,166,255,0.25); }
+.tip-box.warn { background: rgba(247,201,72,0.08); border: 1px solid rgba(247,201,72,0.25); }
+.tip-box.success { background: rgba(63,185,80,0.08); border: 1px solid rgba(63,185,80,0.25); }
+.tip-box.danger { background: rgba(255,123,114,0.08); border: 1px solid rgba(255,123,114,0.25); }
+.tip-icon { font-size: 1.2rem; flex-shrink: 0; margin-top: 2px; }
+.tip-body { flex: 1; }
+.tip-body strong { display: block; margin-bottom: 4px; color: var(--text); }
+.tip-body p { color: var(--text3); font-size: 0.9rem; margin: 0; }
 
-        .code-content { padding: 25px; overflow-x: auto; direction: ltr; text-align: left; }
-        pre { font-family: 'Fira Code', monospace; font-size: 0.95rem; line-height: 1.6; }
+/* ── TABLE ── */
+.data-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 16px 0;
+  font-size: 0.9rem;
+}
+.data-table th {
+  background: var(--bg3);
+  padding: 10px 14px;
+  text-align: right;
+  color: var(--accent);
+  border: 1px solid var(--border);
+  font-weight: 700;
+}
+.data-table td {
+  padding: 10px 14px;
+  border: 1px solid var(--border);
+  color: var(--text3);
+}
+.data-table tr:hover td { background: rgba(247,201,72,0.04); }
+.data-table code {
+  font-family: 'Fira Code', monospace;
+  font-size: 0.82rem;
+  background: var(--bg);
+  padding: 2px 6px;
+  border-radius: 4px;
+  color: var(--accent5);
+  direction: ltr;
+  display: inline-block;
+}
 
-        /* ── قسم Pygame المميز ── */
-        .pygame-badge {
-            background: #e91e63;
-            color: white;
-            padding: 4px 12px;
-            border-radius: 6px;
-            font-size: 0.8rem;
-            font-weight: bold;
-        }
+/* ── GRID ── */
+.grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin: 16px 0; }
+.grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin: 16px 0; }
 
-        /* ── البطاقات ── */
-        .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 25px; }
-        .info-card {
-            background: var(--bg-card);
-            padding: 25px;
-            border-radius: 15px;
-            border: 1px solid var(--border);
-            transition: var(--transition);
-        }
-        .info-card:hover { transform: translateY(-5px); border-color: var(--accent-blue); }
+.mini-card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 16px;
+  transition: border-color 0.2s, transform 0.2s;
+}
+.mini-card:hover { border-color: var(--accent); transform: translateY(-2px); }
+.mini-card h4 { color: var(--accent); font-size: 0.95rem; margin-bottom: 6px; }
+.mini-card p { font-size: 0.82rem; color: var(--text2); margin: 0; }
 
-        /* ── استجابة الشاشة ── */
-        @media (max-width: 1024px) {
-            #sidebar { transform: translateX(100%); }
-            #main { margin-right: 0; }
-            .section { padding: 60px 20px; }
-            .grid-2 { grid-template-columns: 1fr; }
-        }
+/* ── FUN BADGE ── */
+.fun-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba(210,168,255,0.1);
+  border: 1px solid rgba(210,168,255,0.3);
+  color: var(--accent5);
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-size: 0.75rem;
+  margin-bottom: 12px;
+}
 
-        /* ألوان التمييز داخل الكود */
-        .kw { color: #ff7b72; } /* الكلمات المحجوزة */
-        .st { color: #a5d6ff; } /* النصوص */
-        .fn { color: #d2a8ff; } /* الدوال */
-        .cm { color: #8b949e; } /* التعليقات */
-        .nb { color: #f0883e; } /* الأرقام */
-    </style>
+/* ── CHAPTER DIVIDER ── */
+.chapter-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--bg3);
+  border: 1px solid var(--border);
+  padding: 6px 14px;
+  border-radius: 8px;
+  font-size: 0.8rem;
+  color: var(--text2);
+  margin-bottom: 20px;
+}
+
+/* ── QUIZ ── */
+.quiz-box {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 20px;
+  margin: 20px 0;
+}
+.quiz-box h4 { color: var(--accent); margin-bottom: 14px; font-size: 1rem; }
+.quiz-options { display: flex; flex-direction: column; gap: 8px; }
+.quiz-opt {
+  background: var(--bg3);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 10px 14px;
+  cursor: pointer;
+  color: var(--text3);
+  font-size: 0.9rem;
+  transition: all 0.2s;
+  text-align: right;
+}
+.quiz-opt:hover { border-color: var(--accent2); color: var(--accent2); }
+.quiz-opt.correct { border-color: var(--accent3); background: rgba(63,185,80,0.1); color: var(--accent3); }
+.quiz-opt.wrong { border-color: var(--accent4); background: rgba(255,123,114,0.1); color: var(--accent4); }
+.quiz-result { margin-top: 12px; font-size: 0.9rem; display: none; }
+
+/* ── TOGGLE BTN ── */
+#sidebar-toggle {
+  display: none;
+  position: fixed;
+  top: 16px; right: 16px;
+  z-index: 200;
+  background: var(--accent);
+  color: var(--bg);
+  border: none;
+  width: 40px; height: 40px;
+  border-radius: 8px;
+  font-size: 1.2rem;
+  cursor: pointer;
+}
+
+/* ── RESPONSIVE ── */
+@media (max-width: 900px) {
+  #sidebar { transform: translateX(100%); }
+  #sidebar.open { transform: translateX(0); }
+  #main { margin-right: 0; }
+  #sidebar-toggle { display: flex; align-items: center; justify-content: center; }
+  .section { padding: 40px 20px 30px; }
+  #hero { padding: 60px 20px; }
+  #hero h1 { font-size: 2rem; }
+  .grid-2, .grid-3 { grid-template-columns: 1fr; }
+  .hero-stats { gap: 20px; }
+}
+
+/* ── ANIMATIONS ── */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.section { animation: fadeIn 0.5s ease both; }
+
+/* SNAKE DECORATION */
+.snake-line {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--accent3);
+  font-size: 0.8rem;
+  margin-bottom: 10px;
+}
+.snake-line::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: linear-gradient(90deg, var(--accent3), transparent);
+}
+
+/* ── TKINTER SPECIAL ── */
+.tkinter-preview {
+  background: #c0c0c0;
+  border: 2px solid #888;
+  border-radius: 4px;
+  padding: 20px;
+  margin: 16px 0;
+  direction: ltr;
+  font-family: 'Arial', sans-serif;
+  max-width: 320px;
+}
+.tk-titlebar {
+  background: #000080;
+  color: white;
+  padding: 4px 8px;
+  font-size: 12px;
+  margin: -20px -20px 16px -20px;
+  border-radius: 2px 2px 0 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.tk-btn {
+  background: #c0c0c0;
+  border: 2px outset #fff;
+  padding: 4px 12px;
+  font-size: 12px;
+  cursor: pointer;
+  margin: 4px;
+}
+.tk-label { font-size: 13px; margin: 6px 0; }
+.tk-entry {
+  background: white;
+  border: 2px inset #888;
+  padding: 2px 4px;
+  font-size: 12px;
+  width: 140px;
+}
+</style>
 </head>
 <body>
 
+<div id="progress-bar"></div>
+<button id="sidebar-toggle" onclick="toggleSidebar()">☰</button>
+
+<!-- SIDEBAR -->
 <nav id="sidebar">
-    <div id="sidebar-logo">
-        <h2>🐍 أكاديمية بايثون</h2>
-        <p>من الصفر إلى تطوير الألعاب</p>
-    </div>
+  <div id="sidebar-logo">
+    <h2>🐍 بايثون من الصفر</h2>
+    <p>دليلك الشامل للتعلم</p>
+  </div>
 
-    <div class="sidebar-section">
-        <div class="sidebar-section-title">الأساسيات</div>
-        <a href="#intro" class="sidebar-link"><span>📖</span> ماهي بايثون؟</a>
-        <a href="#variables" class="sidebar-link"><span>📦</span> المتغيرات والذاكرة</a>
-    </div>
+  <div class="sidebar-section">
+    <div class="sidebar-section-title">البداية</div>
+    <a href="#hero" class="sidebar-link"><span class="icon">🏠</span>الصفحة الرئيسية</a>
+    <a href="#intro" class="sidebar-link"><span class="icon">📖</span>مقدمة عن بايثون</a>
+    <a href="#install" class="sidebar-link"><span class="icon">⚙️</span>التثبيت والإعداد</a>
+  </div>
 
-    <div class="sidebar-section">
-        <div class="sidebar-section-title">المستوى المتقدم</div>
-        <a href="#oop" class="sidebar-link"><span>🏗️</span> البرمجة الكائنية OOP</a>
-    </div>
+  <div class="sidebar-section">
+    <div class="sidebar-section-title">الأساسيات</div>
+    <a href="#variables" class="sidebar-link"><span class="icon">📦</span>المتغيرات وأنواع البيانات</a>
+    <a href="#operators" class="sidebar-link"><span class="icon">➗</span>العمليات الحسابية</a>
+    <a href="#strings" class="sidebar-link"><span class="icon">🔤</span>النصوص (Strings)</a>
+    <a href="#input" class="sidebar-link"><span class="icon">⌨️</span>الإدخال والإخراج</a>
+  </div>
 
-    <div class="sidebar-section">
-        <div class="sidebar-section-title">تطوير الألعاب</div>
-        <a href="#pygame" class="sidebar-link"><span>🎮</span> مكتبة Pygame</a>
-        <a href="#pygame-loop" class="sidebar-link"><span>🔄</span> حلقة اللعبة</a>
-    </div>
+  <div class="sidebar-section">
+    <div class="sidebar-section-title">التحكم والتكرار</div>
+    <a href="#conditions" class="sidebar-link"><span class="icon">🔀</span>الشروط if/else</a>
+    <a href="#loops" class="sidebar-link"><span class="icon">🔄</span>الحلقات والتكرار</a>
+  </div>
+
+  <div class="sidebar-section">
+    <div class="sidebar-section-title">البنى المتقدمة</div>
+    <a href="#lists" class="sidebar-link"><span class="icon">📋</span>القوائم Lists</a>
+    <a href="#tuples" class="sidebar-link"><span class="icon">🔒</span>Tuples & Sets</a>
+    <a href="#dicts" class="sidebar-link"><span class="icon">📚</span>القواميس Dict</a>
+    <a href="#functions" class="sidebar-link"><span class="icon">⚡</span>الدوال Functions</a>
+  </div>
+
+  <div class="sidebar-section">
+    <div class="sidebar-section-title">البرمجة الكائنية</div>
+    <a href="#oop" class="sidebar-link"><span class="icon">🏗️</span>OOP والكلاسات</a>
+    <a href="#errors" class="sidebar-link"><span class="icon">🛡️</span>معالجة الأخطاء</a>
+    <a href="#files" class="sidebar-link"><span class="icon">📁</span>التعامل مع الملفات</a>
+  </div>
+
+  <div class="sidebar-section">
+    <div class="sidebar-section-title">واجهات رسومية</div>
+    <a href="#tkinter" class="sidebar-link"><span class="icon">🖥️</span>Tkinter — واجهات رسومية</a>
+    <a href="#tkinter-widgets" class="sidebar-link"><span class="icon">🎛️</span>الودجات والعناصر</a>
+    <a href="#tkinter-projects" class="sidebar-link"><span class="icon">🎮</span>مشاريع Tkinter</a>
+  </div>
+
+  <div class="sidebar-section">
+    <div class="sidebar-section-title">مشاريع ممتعة</div>
+    <a href="#projects" class="sidebar-link"><span class="icon">🚀</span>مشاريع للمبتدئين</a>
+  </div>
 </nav>
 
+<!-- MAIN -->
 <main id="main">
-    <section id="hero">
-        <h1>إحترف البرمجة بلغة <span>بايثون</span></h1>
-        <p>تعلم لغة العصر التي تقود الذكاء الاصطناعي، علم البيانات، وتطوير الألعاب. رحلتك تبدأ بسطر واحد.</p>
-        <div class="grid-2" style="max-width: 600px; margin: 0 auto;">
-            <div class="info-card"><strong>+100</strong> درس تطبيقي</div>
-            <div class="info-card"><strong>+5</strong> مشاريع ألعاب</div>
+
+<!-- HERO -->
+<section id="hero">
+  <div class="hero-badge">🐍 دورة بايثون الشاملة — نسخة 2024</div>
+  <h1>تعلّم <span>بايثون</span><br>من الصفر إلى الاحتراف</h1>
+  <p>دليل تفاعلي شامل يأخذك خطوة بخطوة من أول سطر كود إلى بناء تطبيقات رسومية كاملة بـ Tkinter</p>
+  <div class="hero-stats">
+    <div class="stat"><div class="stat-num">12</div><div class="stat-label">فصل تعليمي</div></div>
+    <div class="stat"><div class="stat-num">60+</div><div class="stat-label">مثال تطبيقي</div></div>
+    <div class="stat"><div class="stat-num">5</div><div class="stat-label">مشاريع كاملة</div></div>
+    <div class="stat"><div class="stat-num">∞</div><div class="stat-label">إمكانيات بايثون</div></div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════
+     1. مقدمة عن بايثون
+═══════════════════════════════════════════ -->
+<section class="section" id="intro">
+  <div class="section-header">
+    <div class="section-num">1</div>
+    <h2>مقدمة عن بايثون <small>لماذا بايثون؟ وما الذي يميّزه؟</small></h2>
+  </div>
+
+  <div class="grid-3">
+    <div class="mini-card">
+      <h4>🌍 الأكثر انتشاراً</h4>
+      <p>بايثون من أكثر لغات البرمجة استخداماً في العالم — الذكاء الاصطناعي، الويب، البيانات، والأتمتة</p>
+    </div>
+    <div class="mini-card">
+      <h4>📖 سهل القراءة</h4>
+      <p>الكود شبيه باللغة الإنجليزية العادية، مما يجعله مثالياً للمبتدئين الذين يتعلمون للمرة الأولى</p>
+    </div>
+    <div class="mini-card">
+      <h4>🚀 قوي جداً</h4>
+      <p>يستخدمه Google, Netflix, NASA, Instagram — لغة واحدة تحل كل شيء تقريباً</p>
+    </div>
+  </div>
+
+  <div class="content-block">
+    <h3>🏆 ماذا تستطيع أن تبني بـ بايثون؟</h3>
+    <div class="grid-2">
+      <div class="tip-box info">
+        <div class="tip-icon">🤖</div>
+        <div class="tip-body">
+          <strong>الذكاء الاصطناعي وتعلم الآلة</strong>
+          <p>بناء نماذج ذكاء اصطناعي باستخدام TensorFlow و Scikit-learn</p>
         </div>
-    </section>
-
-    <!-- قسم المتغيرات مع شرح دقيق -->
-    <section class="section" id="variables">
-        <div class="section-header">
-            <div class="section-num">1</div>
-            <h2>المتغيرات وأنواع البيانات <small>Variables & Logic</small></h2>
+      </div>
+      <div class="tip-box success">
+        <div class="tip-icon">🌐</div>
+        <div class="tip-body">
+          <strong>تطوير الويب</strong>
+          <p>مواقع وAPIs بقوة Django و Flask</p>
         </div>
-        
-        <div class="content-block">
-            <h3>💡 شرح دقيق للمفهوم:</h3>
-            <p>المتغير في بايثون ليس مجرد "صندوق"، بل هو <strong>مرجع (Reference)</strong> لعنوان في ذاكرة الحاسوب (RAM). عندما تكتب <code>x = 10</code>، أنت تخبر بايثون أن تجعل الاسم <code>x</code> يشير إلى كائن رقمي قيمته 10.</p>
-            
-            <div class="info-card" style="border-right: 4px solid var(--accent-green);">
-                <strong>ملاحظة احترافية:</strong> بايثون لغة "Dynamic Typing"، مما يعني أنك لا تحتاج لإخبارها بنوع البيانات (مثل int أو string)، هي تكتشف ذلك تلقائياً عند التشغيل!
-            </div>
-
-            <div class="code-wrap">
-                <div class="code-header"><span>variables.py</span></div>
-                <div class="code-content">
-<pre><span class="cm"># بايثون تفهم النوع من القيمة مباشرة</span>
-score = <span class="nb">100</span>          <span class="cm"># int (عدد صحيح)</span>
-price = <span class="nb">19.99</span>        <span class="cm"># float (عدد عشري)</span>
-player_name = <span class="st">"علاء"</span>  <span class="cm"># str (نص)</span>
-
-<span class="cm"># يمكنك تغيير النوع في أي وقت (غير مستحسن غالباً لكنه ممكن)</span>
-x = <span class="nb">5</span>
-x = <span class="st">"الآن أنا نص"</span></pre>
-                </div>
-            </div>
+      </div>
+      <div class="tip-box warn">
+        <div class="tip-icon">📊</div>
+        <div class="tip-body">
+          <strong>تحليل البيانات</strong>
+          <p>استخراج وتحليل البيانات بـ Pandas و Matplotlib</p>
         </div>
-    </section>
-
-    <!-- قسم Pygame الجديد -->
-    <section class="section" id="pygame">
-        <div class="section-header">
-            <div class="section-num">2</div>
-            <h2>تطوير الألعاب باستخدام <span class="pygame-badge">Pygame</span></h2>
+      </div>
+      <div class="tip-box danger">
+        <div class="tip-icon">🖥️</div>
+        <div class="tip-body">
+          <strong>تطبيقات سطح المكتب</strong>
+          <p>واجهات رسومية جميلة باستخدام Tkinter و PyQt</p>
         </div>
+      </div>
+    </div>
+  </div>
 
-        <div class="content-block">
-            <h3>🎮 ماهي Pygame؟</h3>
-            <p>هي مكتبة برمجية مفتوحة المصدر مصممة لكتابة ألعاب الفيديو. تعتمد على مكتبة SDL وتسمح لك بالتحكم في الصور، الأصوات، وحركات لوحة المفاتيح والماوس بسهولة فائقة.</p>
-            
-            <h3>🛠️ التثبيت:</h3>
-            <p>قبل البدء، يجب تثبيت المكتبة عبر Terminal باستخدام أداة pip:</p>
-            <div class="code-wrap">
-                <div class="code-content">
-                    <pre style="color: var(--accent-green)">pip install pygame</pre>
-                </div>
-            </div>
+  <div class="content-block">
+    <h3>✍️ أول برنامج — Hello World!</h3>
+    <p>هذا أبسط برنامج ممكن في بايثون، يطبع رسالة ترحيب على الشاشة:</p>
+    <div class="code-wrap">
+      <div class="code-header">
+        <div class="code-dots"><span class="code-dot dot-r"></span><span class="code-dot dot-y"></span><span class="code-dot dot-g"></span></div>
+        <span class="code-lang">hello.py</span>
+        <button class="copy-btn" onclick="copyCode(this)">نسخ</button>
+      </div>
+      <div class="code-content"><pre><span class="cm"># أول برنامج بايثون في حياتي!</span>
+<span class="bi">print</span>(<span class="st">"مرحباً بالعالم!"</span>)
+<span class="bi">print</span>(<span class="st">"Hello, World!"</span>)
+<span class="bi">print</span>(<span class="st">"🐍 بايثون رائع!"</span>)</pre></div>
+    </div>
+    <div class="output-block"><div class="output-label">📤 الناتج:</div>مرحباً بالعالم!<br>Hello, World!<br>🐍 بايثون رائع!</div>
+  </div>
+</section>
 
-            <h3 id="pygame-loop">🔄 مفهوم "حلقة اللعبة" (Game Loop):</h3>
-            <p>أي لعبة في العالم تتكون من حلقة تكرارية سريعة جداً (تصل لـ 60 مرة في الثانية) تقوم بـ 3 مهام:</p>
-            <ol style="margin-right: 40px; color: var(--text-muted);">
-                <li><strong>معالجة المدخلات:</strong> هل ضغط اللاعب على زر القفز؟</li>
-                <li><strong>تحديث الحالة:</strong> تحريك العدو، حساب الجاذبية.</li>
-                <li><strong>الرسم:</strong> مسح الشاشة ورسم العناصر في مواقعها الجديدة.</li>
-            </ol>
+<!-- ═══════════════════════════════════════════
+     2. التثبيت
+═══════════════════════════════════════════ -->
+<section class="section" id="install">
+  <div class="section-header">
+    <div class="section-num">2</div>
+    <h2>التثبيت والإعداد <small>جهّز بيئة العمل</small></h2>
+  </div>
 
-            <div class="code-wrap">
-                <div class="code-header"><span>basic_game.py</span></div>
-                <div class="code-content">
-<pre><span class="kw">import</span> pygame
+  <div class="content-block">
+    <h3>🔧 كيف تبدأ؟</h3>
+    <div class="grid-3">
+      <div class="mini-card">
+        <h4>1️⃣ حمّل بايثون</h4>
+        <p>اذهب إلى <code style="color:var(--accent2)">python.org</code> وحمّل أحدث إصدار (3.12+)</p>
+      </div>
+      <div class="mini-card">
+        <h4>2️⃣ اختر محرراً</h4>
+        <p>يُنصح بـ <strong>VS Code</strong> أو <strong>PyCharm</strong> أو <strong>Thonny</strong> للمبتدئين</p>
+      </div>
+      <div class="mini-card">
+        <h4>3️⃣ ابدأ البرمجة</h4>
+        <p>افتح terminal واكتب <code style="color:var(--accent3)">python</code> أو شغّل ملفاتك مباشرة</p>
+      </div>
+    </div>
+  </div>
 
-<span class="cm"># 1. تهيئة بايثون جرافيكس</span>
-pygame.init()
-screen = pygame.display.set_mode((<span class="nb">800</span>, <span class="nb">600</span>))
-clock = pygame.time.Clock()
-running = <span class="kw">True</span>
+  <div class="tip-box info">
+    <div class="tip-icon">💡</div>
+    <div class="tip-body">
+      <strong>نصيحة للمبتدئين</strong>
+      <p>استخدم <strong>Google Colab</strong> (colab.google.com) مجاناً في المتصفح — لا حاجة لتثبيت أي شيء!</p>
+    </div>
+  </div>
+</section>
 
-<span class="cm"># 2. حلقة اللعبة الأساسية</span>
-<span class="kw">while</span> running:
-    <span class="cm"># (أ) التحقق من الأحداث (Events)</span>
-    <span class="kw">for</span> event <span class="kw">in</span> pygame.event.get():
-        <span class="kw">if</span> event.type == pygame.QUIT:
-            running = <span class="kw">False</span>
+<!-- ═══════════════════════════════════════════
+     3. المتغيرات وأنواع البيانات
+═══════════════════════════════════════════ -->
+<section class="section" id="variables">
+  <div class="section-header">
+    <div class="section-num">3</div>
+    <h2>المتغيرات وأنواع البيانات <small>Variables & Data Types</small></h2>
+  </div>
 
-    <span class="cm"># (ب) التحديث والرسم</span>
-    screen.fill((<span class="nb">30</span>, <span class="nb">30</span>, <span class="nb">30</span>)) <span class="cm"># لون الخلفية</span>
+  <div class="content-block">
+    <h3>📦 ما هو المتغير؟</h3>
+    <p>المتغير هو صندوق في الذاكرة نخزن فيه معلومة. في بايثون لا حاجة لتحديد النوع مسبقاً!</p>
+    <div class="code-wrap">
+      <div class="code-header">
+        <div class="code-dots"><span class="code-dot dot-r"></span><span class="code-dot dot-y"></span><span class="code-dot dot-g"></span></div>
+        <span class="code-lang">variables.py</span>
+        <button class="copy-btn" onclick="copyCode(this)">نسخ</button>
+      </div>
+      <div class="code-content"><pre><span class="cm"># أمثلة على المتغيرات</span>
+<span class="cm"># اسم المتغير = القيمة</span>
+
+name = <span class="st">"أحمد"</span>              <span class="cm"># نص (String)</span>
+age = <span class="nb">20</span>                  <span class="cm"># عدد صحيح (int)</span>
+height = <span class="nb">1.75</span>             <span class="cm"># عدد عشري (float)</span>
+is_student = <span class="kw">True</span>         <span class="cm"># منطقي (bool)</span>
+grade = <span class="kw">None</span>              <span class="cm"># لا شيء (NoneType)</span>
+
+<span class="bi">print</span>(<span class="st">f"الاسم: {name}"</span>)
+<span class="bi">print</span>(<span class="st">f"العمر: {age} سنة"</span>)
+<span class="bi">print</span>(<span class="st">f"الطول: {height} متر"</span>)
+<span class="bi">print</span>(<span class="st">f"طالب؟ {is_student}"</span>)
+
+<span class="cm"># معرفة نوع المتغير</span>
+<span class="bi">print</span>(<span class="bi">type</span>(name))    <span class="cm"># &lt;class 'str'&gt;</span>
+<span class="bi">print</span>(<span class="bi">type</span>(age))     <span class="cm"># &lt;class 'int'&gt;</span></pre></div>
+    </div>
+    <div class="output-block"><div class="output-label">📤 الناتج:</div>الاسم: أحمد<br>العمر: 20 سنة<br>الطول: 1.75 متر<br>طالب؟ True<br>&lt;class 'str'&gt;<br>&lt;class 'int'&gt;</div>
+  </div>
+
+  <div class="content-block">
+    <h3>🔢 أنواع البيانات الأساسية</h3>
+    <table class="data-table">
+      <tr><th>النوع</th><th>الاسم</th><th>مثال</th><th>الاستخدام</th></tr>
+      <tr><td>نص</td><td><code>str</code></td><td><code>"مرحبا"</code></td><td>الكلمات والجمل</td></tr>
+      <tr><td>عدد صحيح</td><td><code>int</code></td><td><code>42</code></td><td>الأعداد بدون فاصلة</td></tr>
+      <tr><td>عدد عشري</td><td><code>float</code></td><td><code>3.14</code></td><td>الأعداد بفاصلة</td></tr>
+      <tr><td>منطقي</td><td><code>bool</code></td><td><code>True / False</code></td><td>صح أو خطأ</td></tr>
+      <tr><td>لا شيء</td><td><code>None</code></td><td><code>None</code></td><td>غياب القيمة</td></tr>
+    </table>
+  </div>
+
+  <div class="content-block">
+    <h3>🔄 تحويل الأنواع</h3>
+    <div class="code-wrap">
+      <div class="code-header">
+        <div class="code-dots"><span class="code-dot dot-r"></span><span class="code-dot dot-y"></span><span class="code-dot dot-g"></span></div>
+        <span class="code-lang">conversion.py</span>
+        <button class="copy-btn" onclick="copyCode(this)">نسخ</button>
+      </div>
+      <div class="code-content"><pre><span class="cm"># تحويل بين الأنواع</span>
+x = <span class="st">"42"</span>              <span class="cm"># نص</span>
+x_int = <span class="bi">int</span>(x)       <span class="cm"># تحويل إلى عدد صحيح: 42</span>
+x_float = <span class="bi">float</span>(x)   <span class="cm"># تحويل إلى عشري: 42.0</span>
+
+y = <span class="nb">3.9</span>
+y_int = <span class="bi">int</span>(y)        <span class="cm"># تحويل إلى int: 3 (بدون تقريب!)</span>
+
+z = <span class="nb">100</span>
+z_str = <span class="bi">str</span>(z)        <span class="cm"># تحويل إلى نص: "100"</span>
+
+<span class="cm"># مثال ممتع: حساب العمر</span>
+birth_year = <span class="bi">int</span>(<span class="bi">input</span>(<span class="st">"أدخل سنة ميلادك: "</span>))
+current_year = <span class="nb">2024</span>
+my_age = current_year - birth_year
+<span class="bi">print</span>(<span class="st">f"عمرك تقريباً: {my_age} سنة"</span>)</pre></div>
+    </div>
+  </div>
+
+  <div class="quiz-box">
+    <h4>🎯 اختبر نفسك — ما ناتج الكود؟</h4>
+    <div class="code-wrap"><div class="code-content"><pre>x = <span class="nb">5</span>
+y = <span class="nb">2</span>
+<span class="bi">print</span>(<span class="bi">type</span>(x / y))</pre></div></div>
+    <div class="quiz-options">
+      <div class="quiz-opt" onclick="checkAnswer(this, false)">‹class 'int'›</div>
+      <div class="quiz-opt" onclick="checkAnswer(this, true)">‹class 'float'›</div>
+      <div class="quiz-opt" onclick="checkAnswer(this, false)">‹class 'str'›</div>
+    </div>
+    <div class="quiz-result" id="qr1"></div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════
+     4. العمليات الحسابية
+═══════════════════════════════════════════ -->
+<section class="section" id="operators">
+  <div class="section-header">
+    <div class="section-num">4</div>
+    <h2>العمليات الحسابية <small>Operators</small></h2>
+  </div>
+
+  <div class="content-block">
+    <table class="data-table">
+      <tr><th>الرمز</th><th>العملية</th><th>مثال</th><th>الناتج</th></tr>
+      <tr><td><code>+</code></td><td>جمع</td><td><code>5 + 3</code></td><td>8</td></tr>
+      <tr><td><code>-</code></td><td>طرح</td><td><code>10 - 4</code></td><td>6</td></tr>
+      <tr><td><code>*</code></td><td>ضرب</td><td><code>3 * 4</code></td><td>12</td></tr>
+      <tr><td><code>/</code></td><td>قسمة (عشرية)</td><td><code>7 / 2</code></td><td>3.5</td></tr>
+      <tr><td><code>//</code></td><td>قسمة صحيحة</td><td><code>7 // 2</code></td><td>3</td></tr>
+      <tr><td><code>%</code></td><td>باقي القسمة</td><td><code>7 % 2</code></td><td>1</td></tr>
+      <tr><td><code>**</code></td><td>أس (قوة)</td><td><code>2 ** 8</code></td><td>256</td></tr>
+    </table>
+  </div>
+
+  <div class="content-block">
+    <h3>🎮 مثال ممتع — حاسبة BMI</h3>
+    <div class="fun-badge">✨ مثال ممتع</div>
+    <div class="code-wrap">
+      <div class="code-header">
+        <div class="code-dots"><span class="code-dot dot-r"></span><span class="code-dot dot-y"></span><span class="code-dot dot-g"></span></div>
+        <span class="code-lang">bmi_calculator.py</span>
+        <button class="copy-btn" onclick="copyCode(this)">نسخ</button>
+      </div>
+      <div class="code-content"><pre><span class="cm"># حاسبة مؤشر كتلة الجسم (BMI)</span>
+weight = <span class="bi">float</span>(<span class="bi">input</span>(<span class="st">"أدخل وزنك بالكيلوجرام: "</span>))
+height = <span class="bi">float</span>(<span class="bi">input</span>(<span class="st">"أدخل طولك بالمتر: "</span>))
+
+bmi = weight / (height ** <span class="nb">2</span>)
+bmi = <span class="bi">round</span>(bmi, <span class="nb">2</span>)   <span class="cm"># تقريب لرقمين عشريين</span>
+
+<span class="bi">print</span>(<span class="st">f"مؤشر كتلة جسمك: {bmi}"</span>)
+
+<span class="kw">if</span> bmi &lt; <span class="nb">18.5</span>:
+    <span class="bi">print</span>(<span class="st">"⚠️ وزن أقل من الطبيعي"</span>)
+<span class="kw">elif</span> bmi &lt; <span class="nb">25</span>:
+    <span class="bi">print</span>(<span class="st">"✅ وزن طبيعي — ممتاز!"</span>)
+<span class="kw">elif</span> bmi &lt; <span class="nb">30</span>:
+    <span class="bi">print</span>(<span class="st">"⚠️ وزن زائد قليلاً"</span>)
+<span class="kw">else</span>:
+    <span class="bi">print</span>(<span class="st">"🔴 سمنة — يُنصح بمراجعة طبيب"</span>)</pre></div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════
+     5. النصوص Strings
+═══════════════════════════════════════════ -->
+<section class="section" id="strings">
+  <div class="section-header">
+    <div class="section-num">5</div>
+    <h2>النصوص — Strings <small>التعامل مع النصوص باحترافية</small></h2>
+  </div>
+
+  <div class="content-block">
+    <h3>🔤 عمليات أساسية على النصوص</h3>
+    <div class="code-wrap">
+      <div class="code-header">
+        <div class="code-dots"><span class="code-dot dot-r"></span><span class="code-dot dot-y"></span><span class="code-dot dot-g"></span></div>
+        <span class="code-lang">strings.py</span>
+        <button class="copy-btn" onclick="copyCode(this)">نسخ</button>
+      </div>
+      <div class="code-content"><pre>name = <span class="st">"بايثون"</span>
+
+<span class="cm"># الطول</span>
+<span class="bi">print</span>(<span class="bi">len</span>(name))          <span class="cm"># 6</span>
+
+<span class="cm"># تحويل الحالة (للنصوص الإنجليزية)</span>
+text = <span class="st">"hello world"</span>
+<span class="bi">print</span>(text.upper())       <span class="cm"># HELLO WORLD</span>
+<span class="bi">print</span>(text.title())       <span class="cm"># Hello World</span>
+
+<span class="cm"># البحث والاستبدال</span>
+sentence = <span class="st">"أحب البرمجة كثيراً"</span>
+<span class="bi">print</span>(sentence.replace(<span class="st">"كثيراً"</span>, <span class="st">"جداً"</span>))
+
+<span class="cm"># التحقق</span>
+<span class="bi">print</span>(<span class="st">"برمجة"</span> <span class="kw">in</span> sentence)    <span class="cm"># True</span>
+
+<span class="cm"># التقطيع (Slicing)</span>
+word = <span class="st">"Python"</span>
+<span class="bi">print</span>(word[<span class="nb">0</span>])      <span class="cm"># P (أول حرف)</span>
+<span class="bi">print</span>(word[-<span class="nb">1</span>])     <span class="cm"># n (آخر حرف)</span>
+<span class="bi">print</span>(word[<span class="nb">0</span>:<span class="nb">3</span>])    <span class="cm"># Pyt</span>
+<span class="bi">print</span>(word[::-<span class="nb">1</span>])   <span class="cm"># nohtyP (عكس النص!)</span></pre></div>
+    </div>
+  </div>
+
+  <div class="content-block">
+    <h3>🎨 F-Strings — الطريقة العصرية</h3>
+    <div class="code-wrap">
+      <div class="code-header">
+        <div class="code-dots"><span class="code-dot dot-r"></span><span class="code-dot dot-y"></span><span class="code-dot dot-g"></span></div>
+        <span class="code-lang">fstrings.py</span>
+        <button class="copy-btn" onclick="copyCode(this)">نسخ</button>
+      </div>
+      <div class="code-content"><pre>name = <span class="st">"سارة"</span>
+age = <span class="nb">22</span>
+score = <span class="nb">95.678</span>
+
+<span class="cm"># f-string بسيط</span>
+<span class="bi">print</span>(<span class="st">f"مرحباً {name}، عمرك {age} سنة"</span>)
+
+<span class="cm"># تنسيق الأرقام العشرية</span>
+<span class="bi">print</span>(<span class="st">f"درجتك: {score:.2f}"</span>)   <span class="cm"># 95.68</span>
+
+<span class="cm"># عمليات داخل {}  </span>
+<span class="bi">print</span>(<span class="st">f"2 أس 10 = {2**10}"</span>)    <span class="cm"># 1024</span>
+
+<span class="cm"># محاذاة النص</span>
+<span class="bi">print</span>(<span class="st">f"{'الاسم':&lt;15} {'الدرجة':&gt;10}"</span>)
+<span class="bi">print</span>(<span class="st">f"{name:&lt;15} {score:&gt;10.1f}"</span>)</pre></div>
+    </div>
+    <div class="output-block"><div class="output-label">📤 الناتج:</div>مرحباً سارة، عمرك 22 سنة<br>درجتك: 95.68<br>2 أس 10 = 1024</div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════
+     6. الشروط
+═══════════════════════════════════════════ -->
+<section class="section" id="conditions">
+  <div class="section-header">
+    <div class="section-num">6</div>
+    <h2>الشروط — if / elif / else <small>اتخاذ القرارات</small></h2>
+  </div>
+
+  <div class="content-block">
+    <h3>🔀 الصيغة الأساسية</h3>
+    <div class="code-wrap">
+      <div class="code-header">
+        <div class="code-dots"><span class="code-dot dot-r"></span><span class="code-dot dot-y"></span><span class="code-dot dot-g"></span></div>
+        <span class="code-lang">conditions.py</span>
+        <button class="copy-btn" onclick="copyCode(this)">نسخ</button>
+      </div>
+      <div class="code-content"><pre><span class="cm"># مثال: تصنيف الدرجات</span>
+grade = <span class="nb">78</span>
+
+<span class="kw">if</span> grade >= <span class="nb">90</span>:
+    <span class="bi">print</span>(<span class="st">"🏆 ممتاز"</span>)
+<span class="kw">elif</span> grade >= <span class="nb">80</span>:
+    <span class="bi">print</span>(<span class="st">"✅ جيد جداً"</span>)
+<span class="kw">elif</span> grade >= <span class="nb">70</span>:
+    <span class="bi">print</span>(<span class="st">"👍 جيد"</span>)
+<span class="kw">elif</span> grade >= <span class="nb">60</span>:
+    <span class="bi">print</span>(<span class="st">"⚠️ مقبول"</span>)
+<span class="kw">else</span>:
+    <span class="bi">print</span>(<span class="st">"❌ راسب"</span>)</pre></div>
+    </div>
+    <div class="output-block"><div class="output-label">📤 الناتج:</div>👍 جيد</div>
+  </div>
+
+  <div class="content-block">
+    <h3>🎮 مثال ممتع — لعبة تخمين الرقم</h3>
+    <div class="fun-badge">✨ مثال ممتع</div>
+    <div class="code-wrap">
+      <div class="code-header">
+        <div class="code-dots"><span class="code-dot dot-r"></span><span class="code-dot dot-y"></span><span class="code-dot dot-g"></span></div>
+        <span class="code-lang">guess_simple.py</span>
+        <button class="copy-btn" onclick="copyCode(this)">نسخ</button>
+      </div>
+      <div class="code-content"><pre><span class="kw">import</span> random
+
+secret = random.randint(<span class="nb">1</span>, <span class="nb">10</span>)   <span class="cm"># رقم عشوائي 1-10</span>
+guess = <span class="bi">int</span>(<span class="bi">input</span>(<span class="st">"خمّن رقماً من 1 إلى 10: "</span>))
+
+<span class="kw">if</span> guess == secret:
+    <span class="bi">print</span>(<span class="st">"🎉 مبروك! خمّنت الرقم الصحيح!"</span>)
+<span class="kw">elif</span> guess > secret:
+    <span class="bi">print</span>(<span class="st">f"📉 الرقم السري أصغر! كان {secret}"</span>)
+<span class="kw">else</span>:
+    <span class="bi">print</span>(<span class="st">f"📈 الرقم السري أكبر! كان {secret}"</span>)</pre></div>
+    </div>
+  </div>
+
+  <div class="content-block">
+    <h3>⚡ الشرط المختصر (Ternary)</h3>
+    <div class="code-wrap">
+      <div class="code-header">
+        <div class="code-dots"><span class="code-dot dot-r"></span><span class="code-dot dot-y"></span><span class="code-dot dot-g"></span></div>
+        <span class="code-lang">ternary.py</span>
+        <button class="copy-btn" onclick="copyCode(this)">نسخ</button>
+      </div>
+      <div class="code-content"><pre>age = <span class="nb">20</span>
+
+<span class="cm"># الطريقة العادية</span>
+<span class="kw">if</span> age >= <span class="nb">18</span>:
+    status = <span class="st">"بالغ"</span>
+<span class="kw">else</span>:
+    status = <span class="st">"قاصر"</span>
+
+<span class="cm"># الطريقة المختصرة (في سطر واحد!)</span>
+status = <span class="st">"بالغ"</span> <span class="kw">if</span> age >= <span class="nb">18</span> <span class="kw">else</span> <span class="st">"قاصر"</span>
+<span class="bi">print</span>(status)   <span class="cm"># بالغ</span></pre></div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════
+     7. الحلقات
+═══════════════════════════════════════════ -->
+<section class="section" id="loops">
+  <div class="section-header">
+    <div class="section-num">7</div>
+    <h2>الحلقات والتكرار <small>for loops & while loops</small></h2>
+  </div>
+
+  <div class="content-block">
+    <h3>🔄 حلقة for</h3>
+    <div class="code-wrap">
+      <div class="code-header">
+        <div class="code-dots"><span class="code-dot dot-r"></span><span class="code-dot dot-y"></span><span class="code-dot dot-g"></span></div>
+        <span class="code-lang">for_loops.py</span>
+        <button class="copy-btn" onclick="copyCode(this)">نسخ</button>
+      </div>
+      <div class="code-content"><pre><span class="cm"># التكرار مع range</span>
+<span class="kw">for</span> i <span class="kw">in</span> <span class="bi">range</span>(<span class="nb">5</span>):
+    <span class="bi">print</span>(<span class="st">f"رقم: {i}"</span>)   <span class="cm"># 0, 1, 2, 3, 4</span>
+
+<span class="cm"># range(start, stop, step)</span>
+<span class="kw">for</span> i <span class="kw">in</span> <span class="bi">range</span>(<span class="nb">1</span>, <span class="nb">11</span>, <span class="nb">2</span>):
+    <span class="bi">print</span>(i, end=<span class="st">" "</span>)   <span class="cm"># 1 3 5 7 9</span>
+
+<span class="cm"># التكرار على قائمة</span>
+fruits = [<span class="st">"تفاح"</span>, <span class="st">"موز"</span>, <span class="st">"برتقال"</span>, <span class="st">"مانجو"</span>]
+<span class="kw">for</span> fruit <span class="kw">in</span> fruits:
+    <span class="bi">print</span>(<span class="st">f"🍎 {fruit}"</span>)
+
+<span class="cm"># enumerate - مع الترقيم</span>
+<span class="kw">for</span> index, fruit <span class="kw">in</span> <span class="bi">enumerate</span>(fruits, <span class="nb">1</span>):
+    <span class="bi">print</span>(<span class="st">f"{index}. {fruit}"</span>)</pre></div>
+    </div>
+  </div>
+
+  <div class="content-block">
+    <h3>🔃 حلقة while</h3>
+    <div class="code-wrap">
+      <div class="code-header">
+        <div class="code-dots"><span class="code-dot dot-r"></span><span class="code-dot dot-y"></span><span class="code-dot dot-g"></span></div>
+        <span class="code-lang">while_loops.py</span>
+        <button class="copy-btn" onclick="copyCode(this)">نسخ</button>
+      </div>
+      <div class="code-content"><pre><span class="cm"># عدّ تنازلي</span>
+count = <span class="nb">5</span>
+<span class="kw">while</span> count > <span class="nb">0</span>:
+    <span class="bi">print</span>(<span class="st">f"⏱️ {count}..."</span>)
+    count -= <span class="nb">1</span>
+<span class="bi">print</span>(<span class="st">"🚀 انطلق!"</span>)
+
+<span class="cm"># لعبة تخمين كاملة</span>
+<span class="kw">import</span> random
+secret = random.randint(<span class="nb">1</span>, <span class="nb">100</span>)
+attempts = <span class="nb">0</span>
+
+<span class="kw">while</span> <span class="kw">True</span>:
+    guess = <span class="bi">int</span>(<span class="bi">input</span>(<span class="st">"خمّن الرقم (1-100): "</span>))
+    attempts += <span class="nb">1</span>
     
-    <span class="cm"># رسم مربع لاعب (لون، أبعاد: x, y, width, height)</span>
-    pygame.draw.rect(screen, (<span class="nb">0</span>, <span class="nb">255</span>, <span class="nb">0</span>), (<span class="nb">375</span>, <span class="nb">275</span>, <span class="nb">50</span>, <span class="nb">50</span>))
+    <span class="kw">if</span> guess < secret:
+        <span class="bi">print</span>(<span class="st">"📈 أكبر!"</span>)
+    <span class="kw">elif</span> guess > secret:
+        <span class="bi">print</span>(<span class="st">"📉 أصغر!"</span>)
+    <span class="kw">else</span>:
+        <span class="bi">print</span>(<span class="st">f"🎉 صح! وجدته في {attempts} محاولة!"</span>)
+        <span class="kw">break</span></pre></div>
+    </div>
+  </div>
 
-    pygame.display.flip() <span class="cm"># تحديث الشاشة</span>
-    clock.tick(<span class="nb">60</span>)      <span class="cm"># تحديد السرعة بـ 60 إطار في الثانية</span>
+  <div class="content-block">
+    <h3>🎨 List Comprehension — سحر بايثون</h3>
+    <div class="code-wrap">
+      <div class="code-header">
+        <div class="code-dots"><span class="code-dot dot-r"></span><span class="code-dot dot-y"></span><span class="code-dot dot-g"></span></div>
+        <span class="code-lang">comprehension.py</span>
+        <button class="copy-btn" onclick="copyCode(this)">نسخ</button>
+      </div>
+      <div class="code-content"><pre><span class="cm"># الطريقة التقليدية</span>
+squares = []
+<span class="kw">for</span> i <span class="kw">in</span> <span class="bi">range</span>(<span class="nb">1</span>, <span class="nb">6</span>):
+    squares.append(i ** <span class="nb">2</span>)
 
-pygame.quit()</pre>
-                </div>
-            </div>
-            <div class="info-card" style="border-right: 4px solid var(--accent-yellow);">
-                <strong>تمرين:</strong> حاول تغيير الأرقام في <code>screen.fill</code> لتغيير لون الخلفية (نظام RGB).
-            </div>
+<span class="cm"># الطريقة السحرية (List Comprehension) — سطر واحد!</span>
+squares = [i ** <span class="nb">2</span> <span class="kw">for</span> i <span class="kw">in</span> <span class="bi">range</span>(<span class="nb">1</span>, <span class="nb">6</span>)]
+<span class="bi">print</span>(squares)   <span class="cm"># [1, 4, 9, 16, 25]</span>
+
+<span class="cm"># مع شرط</span>
+evens = [i <span class="kw">for</span> i <span class="kw">in</span> <span class="bi">range</span>(<span class="nb">1</span>, <span class="nb">21</span>) <span class="kw">if</span> i % <span class="nb">2</span> == <span class="nb">0</span>]
+<span class="bi">print</span>(evens)     <span class="cm"># [2, 4, 6, ..., 20]</span>
+
+<span class="cm"># تحويل كلمات</span>
+words = [<span class="st">"hello"</span>, <span class="st">"world"</span>, <span class="st">"python"</span>]
+upper = [w.upper() <span class="kw">for</span> w <span class="kw">in</span> words]
+<span class="bi">print</span>(upper)     <span class="cm"># ['HELLO', 'WORLD', 'PYTHON']</span></pre></div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════
+     8. القوائم
+═══════════════════════════════════════════ -->
+<section class="section" id="lists">
+  <div class="section-header">
+    <div class="section-num">8</div>
+    <h2>القوائم — Lists <small>تخزين مجموعات البيانات</small></h2>
+  </div>
+
+  <div class="content-block">
+    <h3>📋 عمليات القوائم</h3>
+    <div class="code-wrap">
+      <div class="code-header">
+        <div class="code-dots"><span class="code-dot dot-r"></span><span class="code-dot dot-y"></span><span class="code-dot dot-g"></span></div>
+        <span class="code-lang">lists.py</span>
+        <button class="copy-btn" onclick="copyCode(this)">نسخ</button>
+      </div>
+      <div class="code-content"><pre><span class="cm"># إنشاء قائمة</span>
+students = [<span class="st">"أحمد"</span>, <span class="st">"سارة"</span>, <span class="st">"محمد"</span>, <span class="st">"نور"</span>]
+
+<span class="cm"># الوصول</span>
+<span class="bi">print</span>(students[<span class="nb">0</span>])      <span class="cm"># أحمد</span>
+<span class="bi">print</span>(students[-<span class="nb">1</span>])     <span class="cm"># نور</span>
+
+<span class="cm"># الإضافة</span>
+students.append(<span class="st">"علي"</span>)         <span class="cm"># في النهاية</span>
+students.insert(<span class="nb">1</span>, <span class="st">"ليلى"</span>)    <span class="cm"># في موضع معين</span>
+
+<span class="cm"># الحذف</span>
+students.remove(<span class="st">"محمد"</span>)       <span class="cm"># بالقيمة</span>
+removed = students.pop()       <span class="cm"># آخر عنصر</span>
+removed = students.pop(<span class="nb">0</span>)     <span class="cm"># بالفهرس</span>
+
+<span class="cm"># الترتيب</span>
+numbers = [<span class="nb">5</span>, <span class="nb">2</span>, <span class="nb">8</span>, <span class="nb">1</span>, <span class="nb">9</span>, <span class="nb">3</span>]
+numbers.sort()              <span class="cm"># تصاعدي: [1, 2, 3, 5, 8, 9]</span>
+numbers.sort(reverse=<span class="kw">True</span>) <span class="cm"># تنازلي</span>
+numbers.reverse()          <span class="cm"># عكس</span>
+
+<span class="cm"># إحصاءات مفيدة</span>
+<span class="bi">print</span>(<span class="bi">max</span>(numbers))   <span class="cm"># أكبر قيمة</span>
+<span class="bi">print</span>(<span class="bi">min</span>(numbers))   <span class="cm"># أصغر قيمة</span>
+<span class="bi">print</span>(<span class="bi">sum</span>(numbers))   <span class="cm"># المجموع</span>
+<span class="bi">print</span>(<span class="bi">len</span>(numbers))   <span class="cm"># عدد العناصر</span></pre></div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════
+     9. Tuples & Sets & Dict
+═══════════════════════════════════════════ -->
+<section class="section" id="tuples">
+  <div class="section-header">
+    <div class="section-num">9</div>
+    <h2>Tuples — Sets — Dictionaries <small>بنى البيانات المتقدمة</small></h2>
+  </div>
+
+  <div class="grid-2">
+    <div class="content-block">
+      <h3>🔒 Tuples — قوائم ثابتة</h3>
+      <div class="code-wrap">
+        <div class="code-header">
+          <div class="code-dots"><span class="code-dot dot-r"></span><span class="code-dot dot-y"></span><span class="code-dot dot-g"></span></div>
+          <span class="code-lang">tuples.py</span>
+          <button class="copy-btn" onclick="copyCode(this)">نسخ</button>
         </div>
-    </section>
+        <div class="code-content"><pre><span class="cm"># Tuple لا يمكن تغييره</span>
+coordinates = (<span class="nb">23.5</span>, <span class="nb">46.8</span>)
+colors = (<span class="st">"أحمر"</span>, <span class="st">"أخضر"</span>, <span class="st">"أزرق"</span>)
+
+lat, lon = coordinates   <span class="cm"># Unpacking</span>
+<span class="bi">print</span>(<span class="st">f"خط العرض: {lat}"</span>)
+
+<span class="cm"># مفيد لإرجاع قيم متعددة</span>
+<span class="kw">def</span> <span class="fn">get_minmax</span>(lst):
+    <span class="kw">return</span> <span class="bi">min</span>(lst), <span class="bi">max</span>(lst)
+
+mn, mx = get_minmax([<span class="nb">3</span>,<span class="nb">1</span>,<span class="nb">4</span>,<span class="nb">1</span>,<span class="nb">5</span>])
+<span class="bi">print</span>(<span class="st">f"أصغر: {mn}, أكبر: {mx}"</span>)</pre></div>
+      </div>
+    </div>
+
+    <div class="content-block">
+      <h3>🎯 Sets — مجموعات فريدة</h3>
+      <div class="code-wrap">
+        <div class="code-header">
+          <div class="code-dots"><span class="code-dot dot-r"></span><span class="code-dot dot-y"></span><span class="code-dot dot-g"></span></div>
+          <span class="code-lang">sets.py</span>
+          <button class="copy-btn" onclick="copyCode(this)">نسخ</button>
+        </div>
+        <div class="code-content"><pre><span class="cm"># Set لا يكرر عناصر</span>
+nums = {<span class="nb">1</span>, <span class="nb">2</span>, <span class="nb">3</span>, <span class="nb">2</span>, <span class="nb">1</span>, <span class="nb">3</span>}
+<span class="bi">print</span>(nums)   <span class="cm"># {1, 2, 3}</span>
+
+<span class="cm"># إزالة المكررات من قائمة</span>
+names = [<span class="st">"أحمد"</span>,<span class="st">"سارة"</span>,<span class="st">"أحمد"</span>,<span class="st">"نور"</span>]
+unique = <span class="bi">list</span>(<span class="bi">set</span>(names))
+<span class="bi">print</span>(unique)
+
+<span class="cm"># عمليات المجموعات</span>
+a = {<span class="nb">1</span>, <span class="nb">2</span>, <span class="nb">3</span>, <span class="nb">4</span>}
+b = {<span class="nb">3</span>, <span class="nb">4</span>, <span class="nb">5</span>, <span class="nb">6</span>}
+<span class="bi">print</span>(a & b)   <span class="cm"># {3, 4} التقاطع</span>
+<span class="bi">print</span>(a | b)   <span class="cm"># {1,2,3,4,5,6} الاتحاد</span>
+<span class="bi">print</span>(a - b)   <span class="cm"># {1, 2} الفرق</span></pre></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="content-block" id="dicts">
+    <h3>📚 القواميس — Dictionaries</h3>
+    <div class="code-wrap">
+      <div class="code-header">
+        <div class="code-dots"><span class="code-dot dot-r"></span><span class="code-dot dot-y"></span><span class="code-dot dot-g"></span></div>
+        <span class="code-lang">dictionaries.py</span>
+        <button class="copy-btn" onclick="copyCode(this)">نسخ</button>
+      </div>
+      <div class="code-content"><pre><span class="cm"># إنشاء قاموس</span>
+student = {
+    <span class="st">"name"</span>: <span class="st">"أحمد"</span>,
+    <span class="st">"age"</span>: <span class="nb">20</span>,
+    <span class="st">"grades"</span>: [<span class="nb">85</span>, <span class="nb">92</span>, <span class="nb">78</span>],
+    <span class="st">"active"</span>: <span class="kw">True</span>
+}
+
+<span class="cm"># الوصول</span>
+<span class="bi">print</span>(student[<span class="st">"name"</span>])            <span class="cm"># أحمد</span>
+<span class="bi">print</span>(student.get(<span class="st">"gpa"</span>, <span class="st">"N/A"</span>))  <span class="cm"># N/A إذا لم يوجد</span>
+
+<span class="cm"># الإضافة والتعديل</span>
+student[<span class="st">"email"</span>] = <span class="st">"ahmed@example.com"</span>
+student[<span class="st">"age"</span>] = <span class="nb">21</span>
+
+<span class="cm"># التكرار</span>
+<span class="kw">for</span> key, value <span class="kw">in</span> student.items():
+    <span class="bi">print</span>(<span class="st">f"{key}: {value}"</span>)
+
+<span class="cm"># قاموس المعجم!</span>
+arabic_english = {
+    <span class="st">"مرحبا"</span>: <span class="st">"Hello"</span>,
+    <span class="st">"شكراً"</span>: <span class="st">"Thank you"</span>,
+    <span class="st">"مع السلامة"</span>: <span class="st">"Goodbye"</span>
+}
+word = <span class="st">"شكراً"</span>
+<span class="bi">print</span>(<span class="st">f"ترجمة '{word}': {arabic_english[word]}"</span>)</pre></div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════
+     10. الدوال
+═══════════════════════════════════════════ -->
+<section class="section" id="functions">
+  <div class="section-header">
+    <div class="section-num">10</div>
+    <h2>الدوال — Functions <small>إعادة استخدام الكود</small></h2>
+  </div>
+
+  <div class="content-block">
+    <h3>⚡ تعريف الدوال</h3>
+    <div class="code-wrap">
+      <div class="code-header">
+        <div class="code-dots"><span class="code-dot dot-r"></span><span class="code-dot dot-y"></span><span class="code-dot dot-g"></span></div>
+        <span class="code-lang">functions.py</span>
+        <button class="copy-btn" onclick="copyCode(this)">نسخ</button>
+      </div>
+      <div class="code-content"><pre><span class="cm"># دالة بسيطة</span>
+<span class="kw">def</span> <span class="fn">greet</span>(name):
+    <span class="kw">return</span> <span class="st">f"أهلاً {name}! 👋"</span>
+
+<span class="bi">print</span>(greet(<span class="st">"سارة"</span>))   <span class="cm"># أهلاً سارة! 👋</span>
+
+<span class="cm"># معاملات افتراضية</span>
+<span class="kw">def</span> <span class="fn">power</span>(base, exp=<span class="nb">2</span>):
+    <span class="kw">return</span> base ** exp
+
+<span class="bi">print</span>(power(<span class="nb">5</span>))      <span class="cm"># 25 (5²)</span>
+<span class="bi">print</span>(power(<span class="nb">2</span>, <span class="nb">10</span>))  <span class="cm"># 1024 (2¹⁰)</span>
+
+<span class="cm"># *args — عدد غير محدد من المعاملات</span>
+<span class="kw">def</span> <span class="fn">total</span>(*numbers):
+    <span class="kw">return</span> <span class="bi">sum</span>(numbers)
+
+<span class="bi">print</span>(total(<span class="nb">1</span>, <span class="nb">2</span>, <span class="nb">3</span>))           <span class="cm"># 6</span>
+<span class="bi">print</span>(total(<span class="nb">10</span>, <span class="nb">20</span>, <span class="nb">30</span>, <span class="nb">40</span>))    <span class="cm"># 100</span>
+
+<span class="cm"># **kwargs — معاملات مسماة</span>
+<span class="kw">def</span> <span class="fn">create_card</span>(**info):
+    <span class="kw">for</span> key, val <span class="kw">in</span> info.items():
+        <span class="bi">print</span>(<span class="st">f"  {key}: {val}"</span>)
+
+create_card(name=<span class="st">"أحمد"</span>, age=<span class="nb">20</span>, city=<span class="st">"القاهرة"</span>)</pre></div>
+    </div>
+  </div>
+
+  <div class="content-block">
+    <h3>🔮 Lambda — دوال مجهولة</h3>
+    <div class="code-wrap">
+      <div class="code-header">
+        <div class="code-dots"><span class="code-dot dot-r"></span><span class="code-dot dot-y"></span><span class="code-dot dot-g"></span></div>
+        <span class="code-lang">lambda.py</span>
+        <button class="copy-btn" onclick="copyCode(this)">نسخ</button>
+      </div>
+      <div class="code-content"><pre><span class="cm"># lambda - دالة في سطر واحد</span>
+square = <span class="kw">lambda</span> x: x ** <span class="nb">2</span>
+add = <span class="kw">lambda</span> x, y: x + y
+
+<span class="bi">print</span>(square(<span class="nb">7</span>))    <span class="cm"># 49</span>
+<span class="bi">print</span>(add(<span class="nb">3</span>, <span class="nb">4</span>))    <span class="cm"># 7</span>
+
+<span class="cm"># ترتيب قائمة معقدة</span>
+students = [
+    {<span class="st">"name"</span>: <span class="st">"أحمد"</span>, <span class="st">"grade"</span>: <span class="nb">85</span>},
+    {<span class="st">"name"</span>: <span class="st">"سارة"</span>, <span class="st">"grade"</span>: <span class="nb">92</span>},
+    {<span class="st">"name"</span>: <span class="st">"علي"</span>, <span class="st">"grade"</span>: <span class="nb">78</span>},
+]
+
+students.sort(key=<span class="kw">lambda</span> s: s[<span class="st">"grade"</span>], reverse=<span class="kw">True</span>)
+<span class="kw">for</span> s <span class="kw">in</span> students:
+    <span class="bi">print</span>(<span class="st">f"{s['name']}: {s['grade']}"</span>)</pre></div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════
+     11. OOP
+═══════════════════════════════════════════ -->
+<section class="section" id="oop">
+  <div class="section-header">
+    <div class="section-num">11</div>
+    <h2>البرمجة الكائنية — OOP <small>Classes & Objects</small></h2>
+  </div>
+
+  <div class="tip-box info">
+    <div class="tip-icon">🧠</div>
+    <div class="tip-body">
+      <strong>ما هي البرمجة الكائنية؟</strong>
+      <p>طريقة لتنظيم الكود في "كائنات" تمثل أشياء حقيقية. مثلاً: السيارة لها صفات (لون، سرعة) وأفعال (تشغيل، توقف)</p>
+    </div>
+  </div>
+
+  <div class="content-block">
+    <h3>🏗️ إنشاء Class</h3>
+    <div class="code-wrap">
+      <div class="code-header">
+        <div class="code-dots"><span class="code-dot dot-r"></span><span class="code-dot dot-y"></span><span class="code-dot dot-g"></span></div>
+        <span class="code-lang">oop_car.py</span>
+        <button class="copy-btn" onclick="copyCode(this)">نسخ</button>
+      </div>
+      <div class="code-content"><pre><span class="kw">class</span> <span class="cl">Car</span>:
+    <span class="cm">"""كلاس يمثل سيارة"""</span>
+    
+    <span class="cm"># متغير مشترك بين جميع السيارات</span>
+    wheels = <span class="nb">4</span>
+    
+    <span class="kw">def</span> <span class="fn">__init__</span>(self, brand, color, speed=<span class="nb">0</span>):
+        self.brand = brand    <span class="cm"># ماركة السيارة</span>
+        self.color = color    <span class="cm"># اللون</span>
+        self.speed = speed    <span class="cm"># السرعة الحالية</span>
+    
+    <span class="kw">def</span> <span class="fn">accelerate</span>(self, amount):
+        self.speed += amount
+        <span class="bi">print</span>(<span class="st">f"🚗 {self.brand}: السرعة الآن {self.speed} كم/س"</span>)
+    
+    <span class="kw">def</span> <span class="fn">brake</span>(self):
+        self.speed = <span class="nb">0</span>
+        <span class="bi">print</span>(<span class="st">f"🛑 {self.brand}: توقفت"</span>)
+    
+    <span class="kw">def</span> <span class="fn">__str__</span>(self):
+        <span class="kw">return</span> <span class="st">f"سيارة {self.brand} ({self.color})"</span>
+
+
+<span class="cm"># إنشاء كائنات</span>
+car1 = <span class="cl">Car</span>(<span class="st">"Toyota"</span>, <span class="st">"أبيض"</span>)
+car2 = <span class="cl">Car</span>(<span class="st">"BMW"</span>, <span class="st">"أسود"</span>)
+
+car1.accelerate(<span class="nb">60</span>)   <span class="cm"># Toyota: السرعة الآن 60 كم/س</span>
+car1.accelerate(<span class="nb">40</span>)   <span class="cm"># Toyota: السرعة الآن 100 كم/س</span>
+car1.brake()           <span class="cm"># Toyota: توقفت</span>
+
+<span class="bi">print</span>(car2)            <span class="cm"># سيارة BMW (أسود)</span></pre></div>
+    </div>
+  </div>
+
+  <div class="content-block">
+    <h3>🧬 الوراثة — Inheritance</h3>
+    <div class="code-wrap">
+      <div class="code-header">
+        <div class="code-dots"><span class="code-dot dot-r"></span><span class="code-dot dot-y"></span><span class="code-dot dot-g"></span></div>
+        <span class="code-lang">inheritance.py</span>
+        <button class="copy-btn" onclick="copyCode(this)">نسخ</button>
+      </div>
+      <div class="code-content"><pre><span class="kw">class</span> <span class="cl">Animal</span>:
+    <span class="kw">def</span> <span class="fn">__init__</span>(self, name):
+        self.name = name
+    
+    <span class="kw">def</span> <span class="fn">speak</span>(self):
+        <span class="kw">return</span> <span class="st">"..."</span>
+    
+    <span class="kw">def</span> <span class="fn">__str__</span>(self):
+        <span class="kw">return</span> <span class="st">f"{self.name} يقول: {self.speak()}"</span>
+
+
+<span class="kw">class</span> <span class="cl">Dog</span>(<span class="cl">Animal</span>):    <span class="cm"># يرث من Animal</span>
+    <span class="kw">def</span> <span class="fn">speak</span>(self):
+        <span class="kw">return</span> <span class="st">"هاو هاو! 🐕"</span>
+
+<span class="kw">class</span> <span class="cl">Cat</span>(<span class="cl">Animal</span>):
+    <span class="kw">def</span> <span class="fn">speak</span>(self):
+        <span class="kw">return</span> <span class="st">"ميياو! 🐱"</span>
+
+<span class="kw">class</span> <span class="cl">Duck</span>(<span class="cl">Animal</span>):
+    <span class="kw">def</span> <span class="fn">speak</span>(self):
+        <span class="kw">return</span> <span class="st">"كواك! 🦆"</span>
+
+
+animals = [<span class="cl">Dog</span>(<span class="st">"ريكس"</span>), <span class="cl">Cat</span>(<span class="st">"كيتي"</span>), <span class="cl">Duck</span>(<span class="st">"دونالد"</span>)]
+<span class="kw">for</span> animal <span class="kw">in</span> animals:
+    <span class="bi">print</span>(animal)</pre></div>
+    </div>
+    <div class="output-block"><div class="output-label">📤 الناتج:</div>ريكس يقول: هاو هاو! 🐕<br>كيتي يقول: ميياو! 🐱<br>دونالد يقول: كواك! 🦆</div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════
+     12. معالجة الأخطاء
+═══════════════════════════════════════════ -->
+<section class="section" id="errors">
+  <div class="section-header">
+    <div class="section-num">12</div>
+    <h2>معالجة الأخطاء <small>Try / Except</small></h2>
+  </div>
+
+  <div class="content-block">
+    <div class="code-wrap">
+      <div class="code-header">
+        <div class="code-dots"><span class="code-dot dot-r"></span><span class="code-dot dot-y"></span><span class="code-dot dot-g"></span></div>
+        <span class="code-lang">exceptions.py</span>
+        <button class="copy-btn" onclick="copyCode(this)">نسخ</button>
+      </div>
+      <div class="code-content"><pre><span class="cm"># بدون معالجة أخطاء — سيتوقف البرنامج!</span>
+<span class="cm"># x = int("hello")  ← ValueError</span>
+
+<span class="cm"># مع معالجة الأخطاء</span>
+<span class="kw">try</span>:
+    number = <span class="bi">int</span>(<span class="bi">input</span>(<span class="st">"أدخل رقماً: "</span>))
+    result = <span class="nb">100</span> / number
+    <span class="bi">print</span>(<span class="st">f"النتيجة: {result}"</span>)
+
+<span class="kw">except</span> <span class="cl">ValueError</span>:
+    <span class="bi">print</span>(<span class="st">"❌ هذا ليس رقماً!"</span>)
+
+<span class="kw">except</span> <span class="cl">ZeroDivisionError</span>:
+    <span class="bi">print</span>(<span class="st">"❌ لا يمكن القسمة على صفر!"</span>)
+
+<span class="kw">except</span> <span class="cl">Exception</span> <span class="kw">as</span> e:
+    <span class="bi">print</span>(<span class="st">f"خطأ غير متوقع: {e}"</span>)
+
+<span class="kw">else</span>:
+    <span class="bi">print</span>(<span class="st">"✅ تم بنجاح!"</span>)    <span class="cm"># يعمل إذا لم يكن هناك خطأ</span>
+
+<span class="kw">finally</span>:
+    <span class="bi">print</span>(<span class="st">"🔚 انتهى البرنامج"</span>)  <span class="cm"># يعمل دائماً</span></pre></div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════
+     13. الملفات
+═══════════════════════════════════════════ -->
+<section class="section" id="files">
+  <div class="section-header">
+    <div class="section-num">13</div>
+    <h2>التعامل مع الملفات <small>File Handling</small></h2>
+  </div>
+
+  <div class="content-block">
+    <div class="code-wrap">
+      <div class="code-header">
+        <div class="code-dots"><span class="code-dot dot-r"></span><span class="code-dot dot-y"></span><span class="code-dot dot-g"></span></div>
+        <span class="code-lang">files.py</span>
+        <button class="copy-btn" onclick="copyCode(this)">نسخ</button>
+      </div>
+      <div class="code-content"><pre><span class="cm"># الكتابة في ملف</span>
+<span class="kw">with</span> <span class="bi">open</span>(<span class="st">"notes.txt"</span>, <span class="st">"w"</span>, encoding=<span class="st">"utf-8"</span>) <span class="kw">as</span> f:
+    f.write(<span class="st">"مرحباً من بايثون!\n"</span>)
+    f.write(<span class="st">"هذا ملف نصي تجريبي\n"</span>)
+
+<span class="cm"># القراءة من ملف</span>
+<span class="kw">with</span> <span class="bi">open</span>(<span class="st">"notes.txt"</span>, <span class="st">"r"</span>, encoding=<span class="st">"utf-8"</span>) <span class="kw">as</span> f:
+    content = f.read()
+    <span class="bi">print</span>(content)
+
+<span class="cm"># قراءة سطراً سطراً</span>
+<span class="kw">with</span> <span class="bi">open</span>(<span class="st">"notes.txt"</span>, <span class="st">"r"</span>, encoding=<span class="st">"utf-8"</span>) <span class="kw">as</span> f:
+    <span class="kw">for</span> line <span class="kw">in</span> f:
+        <span class="bi">print</span>(line.strip())
+
+<span class="cm"># الإضافة للملف (append)</span>
+<span class="kw">with</span> <span class="bi">open</span>(<span class="st">"notes.txt"</span>, <span class="st">"a"</span>, encoding=<span class="st">"utf-8"</span>) <span class="kw">as</span> f:
+    f.write(<span class="st">"سطر جديد مضاف!\n"</span>)
+
+<span class="cm"># حفظ بيانات JSON</span>
+<span class="kw">import</span> json
+
+data = {<span class="st">"name"</span>: <span class="st">"أحمد"</span>, <span class="st">"score"</span>: <span class="nb">95</span>}
+<span class="kw">with</span> <span class="bi">open</span>(<span class="st">"data.json"</span>, <span class="st">"w"</span>) <span class="kw">as</span> f:
+    json.dump(data, f, ensure_ascii=<span class="kw">False</span>, indent=<span class="nb">2</span>)</pre></div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════
+     TKINTER
+═══════════════════════════════════════════ -->
+<section class="section" id="tkinter">
+  <div class="section-header">
+    <div class="section-num" style="background:var(--accent2)">🖥️</div>
+    <h2>Tkinter — واجهات رسومية <small>Graphical User Interface</small></h2>
+  </div>
+
+  <div class="tip-box success">
+    <div class="tip-icon">🎉</div>
+    <div class="tip-body">
+      <strong>Tkinter موجود في بايثون افتراضياً!</strong>
+      <p>لا حاجة لتثبيته — هو مكتبة قياسية مدمجة مع بايثون، اكتب <code style="color:var(--accent3)">import tkinter</code> وابدأ!</p>
+    </div>
+  </div>
+
+  <div class="content-block">
+    <h3>🪟 أول نافذة</h3>
+    <div class="code-wrap">
+      <div class="code-header">
+        <div class="code-dots"><span class="code-dot dot-r"></span><span class="code-dot dot-y"></span><span class="code-dot dot-g"></span></div>
+        <span class="code-lang">first_window.py</span>
+        <button class="copy-btn" onclick="copyCode(this)">نسخ</button>
+      </div>
+      <div class="code-content"><pre><span class="kw">import</span> tkinter <span class="kw">as</span> tk
+
+<span class="cm"># إنشاء النافذة الرئيسية</span>
+root = tk.<span class="cl">Tk</span>()
+root.title(<span class="st">"أول تطبيق Tkinter"</span>)
+root.geometry(<span class="st">"400x300"</span>)       <span class="cm"># العرض x الارتفاع</span>
+root.configure(bg=<span class="st">"#1e1e2e"</span>)   <span class="cm"># لون الخلفية</span>
+root.resizable(<span class="kw">True</span>, <span class="kw">True</span>)    <span class="cm"># قابل للتغيير الحجم</span>
+
+<span class="cm"># إضافة عنوان</span>
+label = tk.<span class="cl">Label</span>(
+    root,
+    text=<span class="st">"مرحباً بالعالم! 🐍"</span>,
+    font=(<span class="st">"Arial"</span>, <span class="nb">20</span>, <span class="st">"bold"</span>),
+    fg=<span class="st">"#f7c948"</span>,
+    bg=<span class="st">"#1e1e2e"</span>
+)
+label.pack(pady=<span class="nb">50</span>)
+
+<span class="cm"># إضافة زر</span>
+<span class="kw">def</span> <span class="fn">on_click</span>():
+    label.config(text=<span class="st">"تم الضغط! 🎉"</span>)
+
+btn = tk.<span class="cl">Button</span>(
+    root,
+    text=<span class="st">"اضغط هنا"</span>,
+    font=(<span class="st">"Arial"</span>, <span class="nb">14</span>),
+    bg=<span class="st">"#58a6ff"</span>,
+    fg=<span class="st">"white"</span>,
+    command=on_click,
+    relief=<span class="st">"flat"</span>,
+    padx=<span class="nb">20</span>, pady=<span class="nb">8</span>
+)
+btn.pack()
+
+<span class="cm"># تشغيل البرنامج (ضروري دائماً)</span>
+root.mainloop()</pre></div>
+    </div>
+
+    <div style="margin-top: 12px;">
+      <p style="color:var(--text2); font-size:0.85rem; margin-bottom:8px;">👁️ معاينة شكل النافذة:</p>
+      <div class="tkinter-preview">
+        <div class="tk-titlebar">
+          <span>أول تطبيق Tkinter</span>
+          <span>✕ □ —</span>
+        </div>
+        <div style="text-align:center; padding: 20px 0;">
+          <div class="tk-label" style="font-size:16px; font-weight:bold; color:#333; margin-bottom:20px;">مرحباً بالعالم! 🐍</div>
+          <button class="tk-btn">اضغط هنا</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Tkinter Widgets -->
+<section class="section" id="tkinter-widgets">
+  <div class="section-header">
+    <div class="section-num" style="background:var(--accent2)">🎛️</div>
+    <h2>عناصر Tkinter — Widgets <small>أدوات بناء الواجهات</small></h2>
+  </div>
+
+  <div class="content-block">
+    <h3>📦 الودجات الأساسية</h3>
+    <table class="data-table">
+      <tr><th>الودجة</th><th>الاستخدام</th><th>مثال</th></tr>
+      <tr><td><code>Label</code></td><td>عرض نص أو صورة</td><td><code>tk.Label(root, text="مرحبا")</code></td></tr>
+      <tr><td><code>Button</code></td><td>زر قابل للضغط</td><td><code>tk.Button(root, text="اضغط", command=func)</code></td></tr>
+      <tr><td><code>Entry</code></td><td>حقل إدخال نص</td><td><code>tk.Entry(root, width=30)</code></td></tr>
+      <tr><td><code>Text</code></td><td>منطقة نص متعدد السطور</td><td><code>tk.Text(root, height=10)</code></td></tr>
+      <tr><td><code>Frame</code></td><td>حاوية لتنظيم العناصر</td><td><code>tk.Frame(root, bg="#fff")</code></td></tr>
+      <tr><td><code>Checkbutton</code></td><td>مربع اختيار</td><td><code>tk.Checkbutton(root, text="موافق")</code></td></tr>
+      <tr><td><code>Radiobutton</code></td><td>خيار من مجموعة</td><td><code>tk.Radiobutton(root, value=1)</code></td></tr>
+      <tr><td><code>Listbox</code></td><td>قائمة منسدلة</td><td><code>tk.Listbox(root, height=5)</code></td></tr>
+      <tr><td><code>Scale</code></td><td>شريط تمرير</td><td><code>tk.Scale(root, from_=0, to=100)</code></td></tr>
+      <tr><td><code>Canvas</code></td><td>رسم وتخطيط</td><td><code>tk.Canvas(root, width=400, height=300)</code></td></tr>
+    </table>
+  </div>
+
+  <div class="content-block">
+    <h3>📐 إدارة التخطيط</h3>
+    <div class="grid-3">
+      <div class="mini-card">
+        <h4>pack()</h4>
+        <p>يرتب العناصر عمودياً أو أفقياً. سهل وسريع للاستخدام</p>
+      </div>
+      <div class="mini-card">
+        <h4>grid()</h4>
+        <p>شبكة صفوف وأعمدة — مثالي للنماذج والجداول</p>
+      </div>
+      <div class="mini-card">
+        <h4>place()</h4>
+        <p>موضع دقيق بالإحداثيات x, y — للتحكم الكامل</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="content-block">
+    <h3>🎨 تطبيق كامل — آلة حاسبة</h3>
+    <div class="fun-badge">✨ مشروع Tkinter</div>
+    <div class="code-wrap">
+      <div class="code-header">
+        <div class="code-dots"><span class="code-dot dot-r"></span><span class="code-dot dot-y"></span><span class="code-dot dot-g"></span></div>
+        <span class="code-lang">calculator.py</span>
+        <button class="copy-btn" onclick="copyCode(this)">نسخ</button>
+      </div>
+      <div class="code-content"><pre><span class="kw">import</span> tkinter <span class="kw">as</span> tk
+
+<span class="kw">class</span> <span class="cl">Calculator</span>:
+    <span class="kw">def</span> <span class="fn">__init__</span>(self, root):
+        self.root = root
+        self.root.title(<span class="st">"🔢 الآلة الحاسبة"</span>)
+        self.root.geometry(<span class="st">"300x400"</span>)
+        self.root.configure(bg=<span class="st">"#1e1e2e"</span>)
+        self.root.resizable(<span class="kw">False</span>, <span class="kw">False</span>)
+        
+        self.expression = <span class="st">""</span>
+        self.create_widgets()
+    
+    <span class="kw">def</span> <span class="fn">create_widgets</span>(self):
+        <span class="cm"># شاشة العرض</span>
+        self.display = tk.<span class="cl">Entry</span>(
+            self.root, font=(<span class="st">"Arial"</span>, <span class="nb">24</span>),
+            bg=<span class="st">"#2d2d3f"</span>, fg=<span class="st">"#f7c948"</span>,
+            bd=<span class="nb">0</span>, justify=<span class="st">"right"</span>, insertbackground=<span class="st">"white"</span>
+        )
+        self.display.pack(fill=<span class="st">"x"</span>, padx=<span class="nb">10</span>, pady=<span class="nb">10</span>)
+        
+        <span class="cm"># أزرار الحاسبة</span>
+        buttons = [
+            [<span class="st">'C'</span>, <span class="st">'⌫'</span>, <span class="st">'%'</span>, <span class="st">'/'</span>],
+            [<span class="st">'7'</span>, <span class="st">'8'</span>, <span class="st">'9'</span>, <span class="st">'*'</span>],
+            [<span class="st">'4'</span>, <span class="st">'5'</span>, <span class="st">'6'</span>, <span class="st">'-'</span>],
+            [<span class="st">'1'</span>, <span class="st">'2'</span>, <span class="st">'3'</span>, <span class="st">'+'</span>],
+            [<span class="st">'0'</span>, <span class="st">'.'</span>, <span class="st">'**'</span>, <span class="st">'='</span>]
+        ]
+        
+        <span class="kw">for</span> row_data <span class="kw">in</span> buttons:
+            frame = tk.<span class="cl">Frame</span>(self.root, bg=<span class="st">"#1e1e2e"</span>)
+            frame.pack(fill=<span class="st">"x"</span>, padx=<span class="nb">5</span>, pady=<span class="nb">2</span>)
+            <span class="kw">for</span> btn_text <span class="kw">in</span> row_data:
+                color = <span class="st">"#58a6ff"</span> <span class="kw">if</span> btn_text <span class="kw">in</span> [<span class="st">'+'</span>,<span class="st">'-'</span>,<span class="st">'*'</span>,<span class="st">'/'</span>,<span class="st">'='</span>] \
+                       <span class="kw">else</span> <span class="st">"#ff7b72"</span> <span class="kw">if</span> btn_text == <span class="st">'C'</span> \
+                       <span class="kw">else</span> <span class="st">"#2d2d3f"</span>
+                tk.<span class="cl">Button</span>(
+                    frame, text=btn_text,
+                    font=(<span class="st">"Arial"</span>, <span class="nb">16</span>, <span class="st">"bold"</span>),
+                    bg=color, fg=<span class="st">"white"</span>, bd=<span class="nb">0</span>,
+                    width=<span class="nb">4</span>, height=<span class="nb">2</span>,
+                    command=<span class="kw">lambda</span> t=btn_text: self.click(t)
+                ).pack(side=<span class="st">"left"</span>, padx=<span class="nb">2</span>, expand=<span class="kw">True</span>, fill=<span class="st">"x"</span>)
+    
+    <span class="kw">def</span> <span class="fn">click</span>(self, char):
+        <span class="kw">if</span> char == <span class="st">'='</span>:
+            <span class="kw">try</span>:
+                result = <span class="bi">eval</span>(self.expression)
+                self.display.delete(<span class="nb">0</span>, tk.END)
+                self.display.insert(<span class="nb">0</span>, <span class="bi">str</span>(result))
+                self.expression = <span class="bi">str</span>(result)
+            <span class="kw">except</span>:
+                self.display.delete(<span class="nb">0</span>, tk.END)
+                self.display.insert(<span class="nb">0</span>, <span class="st">"خطأ"</span>)
+                self.expression = <span class="st">""</span>
+        <span class="kw">elif</span> char == <span class="st">'C'</span>:
+            self.expression = <span class="st">""</span>
+            self.display.delete(<span class="nb">0</span>, tk.END)
+        <span class="kw">elif</span> char == <span class="st">'⌫'</span>:
+            self.expression = self.expression[:-<span class="nb">1</span>]
+            self.display.delete(<span class="nb">0</span>, tk.END)
+            self.display.insert(<span class="nb">0</span>, self.expression)
+        <span class="kw">else</span>:
+            self.expression += char
+            self.display.delete(<span class="nb">0</span>, tk.END)
+            self.display.insert(<span class="nb">0</span>, self.expression)
+
+
+root = tk.<span class="cl">Tk</span>()
+app = <span class="cl">Calculator</span>(root)
+root.mainloop()</pre></div>
+    </div>
+  </div>
+</section>
+
+<!-- Tkinter Projects -->
+<section class="section" id="tkinter-projects">
+  <div class="section-header">
+    <div class="section-num" style="background:var(--accent2)">🎮</div>
+    <h2>مشاريع Tkinter <small>تطبيقات كاملة</small></h2>
+  </div>
+
+  <div class="content-block">
+    <h3>📝 تطبيق المفكرة</h3>
+    <div class="code-wrap">
+      <div class="code-header">
+        <div class="code-dots"><span class="code-dot dot-r"></span><span class="code-dot dot-y"></span><span class="code-dot dot-g"></span></div>
+        <span class="code-lang">notepad.py</span>
+        <button class="copy-btn" onclick="copyCode(this)">نسخ</button>
+      </div>
+      <div class="code-content"><pre><span class="kw">import</span> tkinter <span class="kw">as</span> tk
+<span class="kw">from</span> tkinter <span class="kw">import</span> filedialog, messagebox
+
+<span class="kw">def</span> <span class="fn">new_file</span>():
+    text_area.delete(<span class="st">"1.0"</span>, tk.END)
+    root.title(<span class="st">"مفكرة جديدة"</span>)
+
+<span class="kw">def</span> <span class="fn">open_file</span>():
+    file = filedialog.askopenfilename(
+        filetypes=[(<span class="st">"ملفات نصية"</span>, <span class="st">"*.txt"</span>)]
+    )
+    <span class="kw">if</span> file:
+        <span class="kw">with</span> <span class="bi">open</span>(file, encoding=<span class="st">"utf-8"</span>) <span class="kw">as</span> f:
+            text_area.delete(<span class="st">"1.0"</span>, tk.END)
+            text_area.insert(<span class="st">"1.0"</span>, f.read())
+        root.title(file)
+
+<span class="kw">def</span> <span class="fn">save_file</span>():
+    file = filedialog.asksaveasfilename(
+        defaultextension=<span class="st">".txt"</span>,
+        filetypes=[(<span class="st">"ملفات نصية"</span>, <span class="st">"*.txt"</span>)]
+    )
+    <span class="kw">if</span> file:
+        <span class="kw">with</span> <span class="bi">open</span>(file, <span class="st">"w"</span>, encoding=<span class="st">"utf-8"</span>) <span class="kw">as</span> f:
+            f.write(text_area.get(<span class="st">"1.0"</span>, tk.END))
+        messagebox.showinfo(<span class="st">"تم"</span>, <span class="st">"✅ تم حفظ الملف!"</span>)
+
+root = tk.<span class="cl">Tk</span>()
+root.title(<span class="st">"🗒️ المفكرة"</span>)
+root.geometry(<span class="st">"700x500"</span>)
+
+<span class="cm"># شريط القائمة</span>
+menubar = tk.<span class="cl">Menu</span>(root)
+file_menu = tk.<span class="cl">Menu</span>(menubar, tearoff=<span class="nb">0</span>)
+file_menu.add_command(label=<span class="st">"جديد"</span>, command=new_file, accelerator=<span class="st">"Ctrl+N"</span>)
+file_menu.add_command(label=<span class="st">"فتح"</span>, command=open_file, accelerator=<span class="st">"Ctrl+O"</span>)
+file_menu.add_command(label=<span class="st">"حفظ"</span>, command=save_file, accelerator=<span class="st">"Ctrl+S"</span>)
+file_menu.add_separator()
+file_menu.add_command(label=<span class="st">"خروج"</span>, command=root.quit)
+menubar.add_cascade(label=<span class="st">"ملف"</span>, menu=file_menu)
+root.config(menu=menubar)
+
+<span class="cm"># منطقة الكتابة</span>
+text_area = tk.<span class="cl">Text</span>(
+    root, font=(<span class="st">"Consolas"</span>, <span class="nb">13</span>),
+    bg=<span class="st">"#1e1e2e"</span>, fg=<span class="st">"#e6edf3"</span>,
+    insertbackground=<span class="st">"white"</span>, wrap=<span class="st">"word"</span>,
+    bd=<span class="nb">0</span>, padx=<span class="nb">10</span>, pady=<span class="nb">10</span>
+)
+text_area.pack(fill=<span class="st">"both"</span>, expand=<span class="kw">True</span>)
+
+root.mainloop()</pre></div>
+    </div>
+  </div>
+
+  <div class="content-block">
+    <h3>⏱️ تطبيق الساعة والمؤقت</h3>
+    <div class="code-wrap">
+      <div class="code-header">
+        <div class="code-dots"><span class="code-dot dot-r"></span><span class="code-dot dot-y"></span><span class="code-dot dot-g"></span></div>
+        <span class="code-lang">clock_timer.py</span>
+        <button class="copy-btn" onclick="copyCode(this)">نسخ</button>
+      </div>
+      <div class="code-content"><pre><span class="kw">import</span> tkinter <span class="kw">as</span> tk
+<span class="kw">from</span> datetime <span class="kw">import</span> datetime
+
+root = tk.<span class="cl">Tk</span>()
+root.title(<span class="st">"⏰ الساعة"</span>)
+root.geometry(<span class="st">"350x180"</span>)
+root.configure(bg=<span class="st">"#0d1117"</span>)
+
+time_label = tk.<span class="cl">Label</span>(
+    root, text=<span class="st">""</span>,
+    font=(<span class="st">"Courier New"</span>, <span class="nb">48</span>, <span class="st">"bold"</span>),
+    fg=<span class="st">"#f7c948"</span>, bg=<span class="st">"#0d1117"</span>
+)
+time_label.pack(pady=<span class="nb">20</span>)
+
+date_label = tk.<span class="cl">Label</span>(
+    root, text=<span class="st">""</span>,
+    font=(<span class="st">"Arial"</span>, <span class="nb">14</span>),
+    fg=<span class="st">"#8b949e"</span>, bg=<span class="st">"#0d1117"</span>
+)
+date_label.pack()
+
+<span class="kw">def</span> <span class="fn">update_clock</span>():
+    now = datetime.now()
+    time_label.config(text=now.strftime(<span class="st">"%H:%M:%S"</span>))
+    date_label.config(text=now.strftime(<span class="st">"%Y-%m-%d"</span>))
+    root.after(<span class="nb">1000</span>, update_clock)  <span class="cm"># تحديث كل ثانية</span>
+
+update_clock()
+root.mainloop()</pre></div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════
+     مشاريع ممتعة
+═══════════════════════════════════════════ -->
+<section class="section" id="projects">
+  <div class="section-header">
+    <div class="section-num" style="background:var(--accent3)">🚀</div>
+    <h2>مشاريع للمبتدئين <small>طبّق ما تعلمته!</small></h2>
+  </div>
+
+  <div class="grid-2">
+    <div class="mini-card">
+      <h4>🎲 لعبة الأرقام</h4>
+      <p>لعبة تخمين الرقم مع تتبع المحاولات وتسجيل الأعلى نقطة باستخدام while و random</p>
+    </div>
+    <div class="mini-card">
+      <h4>📊 دفتر العلامات</h4>
+      <p>احسب المعدل ورتب الطلاب وأنتج تقارير باستخدام قوائم وقواميس</p>
+    </div>
+    <div class="mini-card">
+      <h4>📖 قاموس إنجليزي-عربي</h4>
+      <p>ابنِ قاموسك الخاص وخزّنه في ملف JSON مع خاصية البحث والإضافة</p>
+    </div>
+    <div class="mini-card">
+      <h4>🌡️ محول الحرارة</h4>
+      <p>تحويل بين سيلسيوس وفهرنهايت وكلفن مع واجهة Tkinter جميلة</p>
+    </div>
+    <div class="mini-card">
+      <h4>🐍 لعبة Snake</h4>
+      <p>لعبة الثعبان الكلاسيكية باستخدام Tkinter Canvas ومفاتيح الكيبورد</p>
+    </div>
+    <div class="mini-card">
+      <h4>📝 مدير المهام</h4>
+      <p>تطبيق To-Do List كامل بـ Tkinter يحفظ المهام في ملف ويمكن تعديلها وحذفها</p>
+    </div>
+  </div>
+
+  <div class="content-block">
+    <h3>🎯 مثال — لعبة الكلمات الكاملة</h3>
+    <div class="fun-badge">🎮 مشروع ممتع</div>
+    <div class="code-wrap">
+      <div class="code-header">
+        <div class="code-dots"><span class="code-dot dot-r"></span><span class="code-dot dot-y"></span><span class="code-dot dot-g"></span></div>
+        <span class="code-lang">hangman.py</span>
+        <button class="copy-btn" onclick="copyCode(this)">نسخ</button>
+      </div>
+      <div class="code-content"><pre><span class="kw">import</span> random
+
+<span class="kw">def</span> <span class="fn">hangman</span>():
+    words = [<span class="st">"python"</span>, <span class="st">"programming"</span>, <span class="st">"computer"</span>,
+             <span class="st">"algorithm"</span>, <span class="st">"variable"</span>, <span class="st">"function"</span>]
+    
+    word = random.choice(words)
+    guessed = <span class="bi">set</span>()
+    attempts = <span class="nb">6</span>
+    
+    <span class="bi">print</span>(<span class="st">"🎮 لعبة الكلمة المخفية!"</span>)
+    <span class="bi">print</span>(<span class="st">f"الكلمة: {len(word)} حرف\n"</span>)
+    
+    <span class="kw">while</span> attempts > <span class="nb">0</span>:
+        display = [c <span class="kw">if</span> c <span class="kw">in</span> guessed <span class="kw">else</span> <span class="st">"_"</span> <span class="kw">for</span> c <span class="kw">in</span> word]
+        <span class="bi">print</span>(<span class="st">" "</span>.join(display))
+        
+        <span class="kw">if</span> <span class="st">"_"</span> <span class="kw">not in</span> display:
+            <span class="bi">print</span>(<span class="st">f"\n🎉 مبروك! الكلمة: {word}"</span>)
+            <span class="kw">return</span>
+        
+        <span class="bi">print</span>(<span class="st">f"المحاولات المتبقية: {attempts}"</span>)
+        <span class="bi">print</span>(<span class="st">f"الحروف المجرّبة: {', '.join(sorted(guessed))}"</span>)
+        
+        letter = <span class="bi">input</span>(<span class="st">"اختر حرفاً: "</span>).lower()
+        
+        <span class="kw">if</span> letter <span class="kw">in</span> guessed:
+            <span class="bi">print</span>(<span class="st">"⚠️ جرّبت هذا الحرف من قبل!"</span>)
+        <span class="kw">elif</span> letter <span class="kw">in</span> word:
+            guessed.add(letter)
+            <span class="bi">print</span>(<span class="st">"✅ إجابة صحيحة!"</span>)
+        <span class="kw">else</span>:
+            guessed.add(letter)
+            attempts -= <span class="nb">1</span>
+            <span class="bi">print</span>(<span class="st">f"❌ خطأ! المحاولات: {attempts}"</span>)
+        <span class="bi">print</span>()
+    
+    <span class="bi">print</span>(<span class="st">f"💀 انتهت المحاولات! الكلمة كانت: {word}"</span>)
+
+hangman()</pre></div>
+    </div>
+  </div>
+
+  <div class="tip-box success">
+    <div class="tip-icon">🏁</div>
+    <div class="tip-body">
+      <strong>الخطوة التالية — ماذا تتعلم بعد؟</strong>
+      <p>بعد إتقان هذه الأساسيات، جرّب: <strong>مكتبة Pandas</strong> لتحليل البيانات، <strong>Flask</strong> لتطوير الويب، <strong>Pygame</strong> لتطوير الألعاب، أو <strong>Scikit-learn</strong> للذكاء الاصطناعي. السماء هي الحد!</p>
+    </div>
+  </div>
+
+  <div style="text-align:center; padding: 40px 0 10px; color: var(--text2); font-size:0.9rem;">
+    صُنع بـ ❤️ لمحبي تعلم البرمجة | بايثون 3.x | <span style="color:var(--accent)">🐍</span>
+  </div>
+</section>
+
 </main>
 
 <script>
-    // تحديث شريط التقدم عند التمرير
-    window.onscroll = function() {
-        let winScroll = document.body.scrollTop || document.documentElement.scrollTop;
-        let height = document.documentElement.scrollHeight - document.documentElement.clientHeight;
-        let scrolled = (winScroll / height) * 100;
-        document.getElementById("progress-bar").style.width = scrolled + "%";
-    };
+// Progress bar
+window.addEventListener('scroll', () => {
+  const winScroll = document.body.scrollTop || document.documentElement.scrollTop;
+  const height = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+  const scrolled = (winScroll / height) * 100;
+  document.getElementById('progress-bar').style.width = scrolled + '%';
+});
 
-    function copyCode(btn) {
-        const code = btn.parentElement.nextElementSibling.innerText;
-        navigator.clipboard.writeText(code);
-        btn.innerText = "تم النسخ!";
-        setTimeout(() => btn.innerText = "نسخ", 2000);
+// Active sidebar link
+const sections = document.querySelectorAll('section[id]');
+const links = document.querySelectorAll('.sidebar-link');
+
+window.addEventListener('scroll', () => {
+  let current = '';
+  sections.forEach(section => {
+    const sectionTop = section.offsetTop - 100;
+    if (window.scrollY >= sectionTop) current = section.getAttribute('id');
+  });
+  links.forEach(link => {
+    link.classList.remove('active');
+    if (link.getAttribute('href') === '#' + current) link.classList.add('active');
+  });
+});
+
+// Copy code
+function copyCode(btn) {
+  const pre = btn.closest('.code-wrap').querySelector('pre');
+  const text = pre.innerText;
+  navigator.clipboard.writeText(text).then(() => {
+    btn.textContent = '✅ تم';
+    setTimeout(() => btn.textContent = 'نسخ', 2000);
+  });
+}
+
+// Quiz
+function checkAnswer(el, isCorrect) {
+  const opts = el.parentElement.querySelectorAll('.quiz-opt');
+  opts.forEach(o => o.style.pointerEvents = 'none');
+  if (isCorrect) {
+    el.classList.add('correct');
+  } else {
+    el.classList.add('wrong');
+    opts.forEach(o => { if (o.dataset.correct) o.classList.add('correct'); });
+  }
+}
+
+// Sidebar toggle (mobile)
+function toggleSidebar() {
+  document.getElementById('sidebar').classList.toggle('open');
+}
+
+// Close sidebar on link click (mobile)
+links.forEach(link => {
+  link.addEventListener('click', () => {
+    if (window.innerWidth < 900) {
+      document.getElementById('sidebar').classList.remove('open');
     }
+  });
+});
 </script>
-
 </body>
 </html>
