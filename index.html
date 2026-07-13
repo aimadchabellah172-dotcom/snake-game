@@ -1,0 +1,1136 @@
+L
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ورشة الملفات | File Workshop</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600&family=Tajawal:wght@400;500;700;800&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+<style>
+  :root{
+    --bg-1:#0B1B2B;
+    --bg-2:#0F2438;
+    --panel:#122A40;
+    --panel-2:#163350;
+    --ink:#E9F1F5;
+    --ink-dim:#9FB4C4;
+    --cyan:#4FD1E8;
+    --amber:#F0A93E;
+    --green:#63C99A;
+    --red:#E8615F;
+    --line: rgba(79,209,232,0.22);
+    --grid-size: 42px;
+    --radius: 14px;
+    --font-display:'Space Grotesk', 'Tajawal', sans-serif;
+    --font-body:'Inter','Tajawal', sans-serif;
+    --shadow: 0 10px 30px rgba(0,0,0,0.35);
+  }
+  body.light{
+    --bg-1:#EAF1F5;
+    --bg-2:#DCE7ED;
+    --panel:#FFFFFF;
+    --panel-2:#F3F8FA;
+    --ink:#122234;
+    --ink-dim:#4C6478;
+    --cyan:#0E93AC;
+    --amber:#C9791F;
+    --green:#2A9467;
+    --red:#C4433F;
+    --line: rgba(14,147,172,0.18);
+    --shadow: 0 10px 26px rgba(20,60,80,0.12);
+  }
+  body.lang-ar, body.lang-ar *{ font-family: 'Tajawal','Space Grotesk',sans-serif; }
+  *{ box-sizing:border-box; }
+  html,body{ margin:0; padding:0; }
+  body{
+    background:
+      linear-gradient(var(--line) 1px, transparent 1px) 0 0/var(--grid-size) var(--grid-size),
+      linear-gradient(90deg, var(--line) 1px, transparent 1px) 0 0/var(--grid-size) var(--grid-size),
+      radial-gradient(1200px 700px at 15% -10%, var(--bg-2), var(--bg-1));
+    color:var(--ink);
+    font-family:var(--font-body);
+    min-height:100vh;
+    transition: background-color .4s ease, color .4s ease;
+    overflow-x:hidden;
+  }
+  ::selection{ background:var(--cyan); color:#03222b; }
+ 
+  a{ color:inherit; }
+  button{ font-family:inherit; cursor:pointer; }
+ 
+  .wrap{ max-width:1180px; margin:0 auto; padding:0 22px; }
+ 
+  /* Header */
+  header.top{
+    display:flex; align-items:center; justify-content:space-between;
+    padding:20px 0; gap:16px; flex-wrap:wrap;
+  }
+  .brand{ display:flex; align-items:center; gap:12px; }
+  .brand svg{ width:40px; height:40px; }
+  .brand-text{ display:flex; flex-direction:column; line-height:1.1; }
+  .brand-text b{ font-family:var(--font-display); font-size:1.15rem; letter-spacing:.3px; }
+  .brand-text span{ font-size:.75rem; color:var(--ink-dim); }
+ 
+  .controls{ display:flex; gap:10px; align-items:center; }
+  .pill-btn{
+    display:flex; align-items:center; gap:8px;
+    background:var(--panel); border:1px solid var(--line);
+    color:var(--ink); border-radius:999px; padding:9px 16px;
+    font-size:.85rem; font-weight:600; transition: all .25s ease;
+  }
+  .pill-btn:hover{ border-color:var(--cyan); transform:translateY(-2px); box-shadow:var(--shadow); }
+  .pill-btn:active{ transform:translateY(0); }
+ 
+  /* Hero */
+  .hero{ padding:56px 0 30px; position:relative; }
+  .hero-eyebrow{
+    display:inline-flex; align-items:center; gap:8px;
+    border:1px dashed var(--cyan); color:var(--cyan);
+    padding:6px 14px; border-radius:999px; font-size:.78rem; font-weight:600;
+    margin-bottom:22px; opacity:0; animation: fadeUp .6s ease forwards .1s;
+  }
+  .hero h1{
+    font-family:var(--font-display); font-size:clamp(2.1rem,5vw,3.4rem);
+    line-height:1.15; margin:0 0 18px; max-width:800px; font-weight:700;
+    opacity:0; animation: fadeUp .7s ease forwards .22s;
+  }
+  .hero h1 .accent{ color:var(--cyan); }
+  .hero p.lead{
+    color:var(--ink-dim); font-size:1.08rem; max-width:620px; margin:0 0 30px;
+    opacity:0; animation: fadeUp .7s ease forwards .34s;
+  }
+  .hero-stats{ display:flex; gap:28px; flex-wrap:wrap; opacity:0; animation: fadeUp .7s ease forwards .46s; }
+  .hero-stat b{ display:block; font-family:var(--font-display); font-size:1.5rem; color:var(--amber); }
+  .hero-stat span{ font-size:.78rem; color:var(--ink-dim); }
+ 
+  @keyframes fadeUp{ from{ opacity:0; transform:translateY(16px);} to{ opacity:1; transform:translateY(0);} }
+ 
+  /* blueprint deco */
+  .blueprint-deco{ position:absolute; top:20px; inset-inline-end:0; width:220px; height:220px; opacity:.5; pointer-events:none; }
+  .dash{ stroke-dasharray: 6 8; animation: dashmove 6s linear infinite; }
+  @keyframes dashmove{ to{ stroke-dashoffset:-140; } }
+ 
+  /* Tabs */
+  nav.tabs{
+    display:flex; gap:10px; margin:38px 0 26px; flex-wrap:wrap;
+  }
+  .tab-btn{
+    background:var(--panel); border:1px solid var(--line); color:var(--ink-dim);
+    padding:12px 18px; border-radius:12px; font-weight:600; font-size:.92rem;
+    display:flex; align-items:center; gap:9px; transition: all .25s ease;
+    position:relative; overflow:hidden;
+  }
+  .tab-btn svg{ width:18px; height:18px; flex-shrink:0; }
+  .tab-btn:hover{ color:var(--ink); border-color:var(--cyan); }
+  .tab-btn.active{ color:var(--bg-1); background:var(--cyan); border-color:var(--cyan); box-shadow:var(--shadow); }
+  body.light .tab-btn.active{ color:#fff; }
+ 
+  /* Panels */
+  .panel{ display:none; animation: fadeUp .45s ease; }
+  .panel.active{ display:block; }
+ 
+  .card{
+    background:var(--panel); border:1px solid var(--line); border-radius: var(--radius);
+    padding:26px; box-shadow:var(--shadow); margin-bottom:18px;
+  }
+  .card h2{ font-family:var(--font-display); margin:0 0 6px; font-size:1.3rem; }
+  .card p.desc{ color:var(--ink-dim); margin:0 0 20px; font-size:.92rem; }
+ 
+  .dropzone{
+    border:2px dashed var(--line); border-radius:12px; padding:34px 20px;
+    text-align:center; cursor:pointer; transition: all .25s ease; position:relative;
+    background: repeating-linear-gradient(135deg, transparent 0 12px, rgba(79,209,232,0.03) 12px 24px);
+  }
+  .dropzone.drag{ border-color:var(--cyan); background: rgba(79,209,232,0.06); }
+  .dropzone svg{ width:38px; height:38px; color:var(--cyan); margin-bottom:10px; }
+  .dropzone b{ display:block; margin-bottom:4px; }
+  .dropzone span{ color:var(--ink-dim); font-size:.82rem; }
+  .dropzone input{ display:none; }
+ 
+  .file-list{ display:flex; flex-wrap:wrap; gap:12px; margin-top:18px; }
+  .file-chip{
+    display:flex; align-items:center; gap:10px; background:var(--panel-2);
+    border:1px solid var(--line); border-radius:10px; padding:8px 10px 8px 8px;
+    font-size:.82rem; max-width:220px;
+  }
+  body.lang-ar .file-chip{ padding:8px 8px 8px 10px; }
+  .file-chip img{ width:34px; height:34px; object-fit:cover; border-radius:6px; }
+  .file-chip .fname{ overflow:hidden; text-overflow:ellipsis; white-space:nowrap; max-width:110px; }
+  .file-chip button{
+    background:none; border:none; color:var(--red); font-size:1rem; line-height:1; padding:2px;
+  }
+ 
+  .row{ display:flex; gap:12px; flex-wrap:wrap; align-items:center; margin-top:18px; }
+  .btn{
+    background:var(--cyan); color:var(--bg-1); border:none; border-radius:10px;
+    padding:12px 22px; font-weight:700; font-size:.92rem; transition: all .2s ease;
+    display:inline-flex; align-items:center; gap:8px;
+  }
+  .btn:hover{ filter:brightness(1.08); transform:translateY(-2px); }
+  .btn:disabled{ opacity:.5; cursor:not-allowed; transform:none; }
+  .btn.ghost{ background:transparent; border:1px solid var(--line); color:var(--ink); }
+  .btn.amber{ background:var(--amber); }
+ 
+  select, .toggle-check{
+    background:var(--panel-2); border:1px solid var(--line); color:var(--ink);
+    padding:10px 14px; border-radius:10px; font-size:.85rem; font-weight:600;
+  }
+  label.check{ display:flex; align-items:center; gap:8px; font-size:.85rem; color:var(--ink-dim); cursor:pointer; }
+ 
+  .status{ margin-top:14px; font-size:.85rem; color:var(--ink-dim); min-height:20px; }
+  .status.ok{ color:var(--green); }
+  .status.err{ color:var(--red); }
+ 
+  .progress{ height:6px; border-radius:99px; background:var(--panel-2); overflow:hidden; margin-top:12px; display:none; }
+  .progress.show{ display:block; }
+  .progress i{ display:block; height:100%; width:0%; background:linear-gradient(90deg,var(--cyan),var(--amber)); transition: width .3s ease; }
+ 
+  .subtabs{ display:flex; gap:8px; margin-bottom:20px; flex-wrap:wrap; }
+  .subtab-btn{
+    background:var(--panel-2); border:1px solid var(--line); color:var(--ink-dim);
+    padding:8px 14px; border-radius:999px; font-size:.8rem; font-weight:600;
+  }
+  .subtab-btn.active{ background:var(--amber); color:#2a1a02; border-color:var(--amber); }
+  .subpanel{ display:none; }
+  .subpanel.active{ display:block; }
+ 
+  textarea{
+    width:100%; min-height:140px; background:var(--panel-2); border:1px solid var(--line);
+    color:var(--ink); border-radius:10px; padding:14px; font-family:monospace; font-size:.85rem; resize:vertical;
+  }
+ 
+  .result-list{ margin-top:16px; display:flex; flex-direction:column; gap:8px; }
+  .result-item{
+    display:flex; align-items:center; justify-content:space-between; gap:10px;
+    background:var(--panel-2); border:1px solid var(--line); border-radius:10px; padding:10px 14px; font-size:.85rem;
+  }
+  .result-item a{ color:var(--cyan); font-weight:700; text-decoration:none; }
+  .result-item a:hover{ text-decoration:underline; }
+ 
+  /* Robot mascot */
+  .robot-dock{
+    position:fixed; bottom:22px; inset-inline-end:22px; z-index:60;
+    display:flex; align-items:flex-end; gap:12px; max-width:320px;
+  }
+  body.lang-ar .robot-dock{ flex-direction:row-reverse; }
+  .speech{
+    background:var(--panel); border:1px solid var(--cyan); border-radius:14px;
+    padding:12px 16px; font-size:.82rem; box-shadow:var(--shadow); position:relative;
+    max-width:230px; opacity:0; transform:translateY(6px) scale(.98); transition: all .3s ease;
+  }
+  .speech.show{ opacity:1; transform:translateY(0) scale(1); }
+  .robot-btn{ background:none; border:none; padding:0; }
+  .robot-svg{ width:64px; height:64px; filter:drop-shadow(0 6px 14px rgba(0,0,0,.35)); }
+  .robot-svg .eye{ animation: blink 4.2s infinite; transform-origin:center; }
+  @keyframes blink{ 0%,92%,100%{ transform:scaleY(1);} 95%{ transform:scaleY(.1);} }
+  .robot-svg .antenna-dot{ animation: pulse 1.6s ease-in-out infinite; }
+  @keyframes pulse{ 0%,100%{ opacity:1; } 50%{ opacity:.3; } }
+  .robot-float{ animation: floatY 3.2s ease-in-out infinite; }
+  @keyframes floatY{ 0%,100%{ transform:translateY(0);} 50%{ transform:translateY(-6px);} }
+ 
+  footer{ text-align:center; padding:60px 0 40px; color:var(--ink-dim); font-size:.82rem; }
+ 
+  @media (max-width: 640px){
+    .robot-dock{ inset-inline-end:12px; bottom:12px; }
+    .robot-svg{ width:50px; height:50px; }
+    .speech{ max-width:170px; font-size:.76rem; padding:9px 12px; }
+  }
+</style>
+</head>
+<body class="lang-ar">
+ 
+<div class="wrap">
+  <header class="top">
+    <div class="brand">
+      <svg viewBox="0 0 48 48" fill="none">
+        <rect x="4" y="4" width="40" height="40" rx="10" stroke="var(--cyan)" stroke-width="2"/>
+        <path d="M14 30 L14 14 L26 14 L26 18 L18 18 L18 30 Z" fill="var(--amber)"/>
+        <circle cx="32" cy="24" r="6" stroke="var(--cyan)" stroke-width="2"/>
+      </svg>
+      <div class="brand-text">
+        <b data-i18n="brand">ورشة الملفات</b>
+        <span data-i18n="brand_sub">أدوات ملفات ذكية بين يديك</span>
+      </div>
+    </div>
+    <div class="controls">
+      <button class="pill-btn" id="langToggle">🌐 <span data-i18n="lang_btn">English</span></button>
+      <button class="pill-btn" id="themeToggle">🌙 <span data-i18n="theme_btn">الوضع الليلي</span></button>
+    </div>
+  </header>
+ 
+  <section class="hero">
+    <svg class="blueprint-deco" viewBox="0 0 220 220" fill="none">
+      <circle class="dash" cx="110" cy="110" r="90" stroke="var(--cyan)" stroke-width="1.4"/>
+      <circle class="dash" cx="110" cy="110" r="60" stroke="var(--amber)" stroke-width="1.2"/>
+      <path class="dash" d="M20 110 H200 M110 20 V200" stroke="var(--cyan)" stroke-width="1"/>
+    </svg>
+    <div class="hero-eyebrow" data-i18n="hero_eyebrow">مصمم مثل مخطط هندسي — بسيط ودقيق</div>
+    <h1 data-i18n="hero_title">حوّل، اضغط، وافكّ ملفاتك <span class="accent" data-i18n="hero_title_accent">في مكان واحد</span></h1>
+    <p class="lead" data-i18n="hero_lead">أربع أدوات تعمل بالكامل داخل متصفحك: صور إلى PDF، مسح ورقة إلى PDF، ضغط وفك ضغط الملفات، وتحويل الصيغ. لا حاجة لرفع ملفاتك لأي خادوم.</p>
+    <div class="hero-stats">
+      <div class="hero-stat"><b>4</b><span data-i18n="stat_tools">أدوات رئيسية</span></div>
+      <div class="hero-stat"><b>100%</b><span data-i18n="stat_local">تعمل محليًا في المتصفح</span></div>
+      <div class="hero-stat"><b>2</b><span data-i18n="stat_lang">لغتان مدعومتان</span></div>
+    </div>
+  </section>
+ 
+  <nav class="tabs">
+    <button class="tab-btn active" data-tab="images-pdf">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg>
+      <span data-i18n="tab_images">صور ← PDF</span>
+    </button>
+    <button class="tab-btn" data-tab="scan-pdf">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 7V4h4M20 7V4h-4M4 17v3h4M20 17v3h-4"/><path d="M4 12h16"/></svg>
+      <span data-i18n="tab_scan">مسح ورقة ← PDF</span>
+    </button>
+    <button class="tab-btn" data-tab="zip">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 8v13H3V8"/><path d="M1 3h22v5H1z"/><path d="M10 12h4"/></svg>
+      <span data-i18n="tab_zip">ضغط / فك الضغط</span>
+    </button>
+    <button class="tab-btn" data-tab="convert">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 7h13M17 7l-3-3M17 7l-3 3"/><path d="M20 17H7M7 17l3 3M7 17l3-3"/></svg>
+      <span data-i18n="tab_convert">تحويل الصيغ</span>
+    </button>
+  </nav>
+ 
+  <!-- PANEL 1: images to pdf -->
+  <section class="panel active" id="panel-images-pdf">
+    <div class="card">
+      <h2 data-i18n="imgpdf_title">حوّل الصور إلى ملف PDF واحد</h2>
+      <p class="desc" data-i18n="imgpdf_desc">أضف عدة صور بأي ترتيب، وسنرتبها في صفحات PDF بنفس أبعاد كل صورة.</p>
+      <div class="dropzone" id="dz-images">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M12 16V4M12 4l-4 4M12 4l4 4"/><path d="M4 16v3a2 2 0 002 2h12a2 2 0 002-2v-3"/></svg>
+        <b data-i18n="dz_images_title">اسحب الصور هنا أو اضغط للاختيار</b>
+        <span data-i18n="dz_images_sub">يدعم JPG, PNG, WEBP</span>
+        <input type="file" id="input-images" accept="image/*" multiple>
+      </div>
+      <div class="file-list" id="list-images"></div>
+      <div class="row">
+        <button class="btn" id="btn-make-pdf" disabled data-i18n="btn_make_pdf">حوّل إلى PDF</button>
+        <button class="btn ghost" id="btn-clear-images" data-i18n="btn_clear">تفريغ القائمة</button>
+      </div>
+      <div class="progress" id="progress-images"><i></i></div>
+      <div class="status" id="status-images"></div>
+    </div>
+  </section>
+ 
+  <!-- PANEL 2: scan to pdf -->
+  <section class="panel" id="panel-scan-pdf">
+    <div class="card">
+      <h2 data-i18n="scan_title">حوّل صورة ورقة مكتوبة إلى PDF</h2>
+      <p class="desc" data-i18n="scan_desc">صوّر ورقتك بالكاميرا وارفعها هنا، ويمكنك تفعيل «وضع المسح الضوئي» لتحسين التباين والوضوح كأنها ممسوحة بماسحة ضوئية.</p>
+      <div class="dropzone" id="dz-scan">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="4" y="3" width="16" height="18" rx="2"/><path d="M8 8h8M8 12h8M8 16h5"/></svg>
+        <b data-i18n="dz_scan_title">اسحب صورة الورقة هنا أو اضغط للاختيار</b>
+        <span data-i18n="dz_scan_sub">يمكنك إضافة عدة صفحات</span>
+        <input type="file" id="input-scan" accept="image/*" multiple>
+      </div>
+      <div class="file-list" id="list-scan"></div>
+      <div class="row">
+        <label class="check"><input type="checkbox" id="chk-scan-mode" checked> <span data-i18n="chk_scan_mode">وضع المسح الضوئي (تحسين التباين)</span></label>
+      </div>
+      <div class="row">
+        <button class="btn" id="btn-make-scan-pdf" disabled data-i18n="btn_make_pdf">حوّل إلى PDF</button>
+        <button class="btn ghost" id="btn-clear-scan" data-i18n="btn_clear">تفريغ القائمة</button>
+      </div>
+      <div class="progress" id="progress-scan"><i></i></div>
+      <div class="status" id="status-scan"></div>
+    </div>
+  </section>
+ 
+  <!-- PANEL 3: zip -->
+  <section class="panel" id="panel-zip">
+    <div class="card">
+      <h2 data-i18n="zip_compress_title">ضغط عدة ملفات إلى ZIP</h2>
+      <p class="desc" data-i18n="zip_compress_desc">اختر أي ملفات وسنجمعها في ملف ZIP واحد يمكنك تنزيله.</p>
+      <div class="dropzone" id="dz-compress">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M21 8v13H3V8"/><path d="M1 3h22v5H1z"/><path d="M10 12h4"/></svg>
+        <b data-i18n="dz_compress_title">اسحب الملفات هنا أو اضغط للاختيار</b>
+        <span data-i18n="dz_compress_sub">أي نوع ملف مسموح</span>
+        <input type="file" id="input-compress" multiple>
+      </div>
+      <div class="file-list" id="list-compress"></div>
+      <div class="row">
+        <button class="btn" id="btn-make-zip" disabled data-i18n="btn_make_zip">أنشئ ملف ZIP</button>
+        <button class="btn ghost" id="btn-clear-compress" data-i18n="btn_clear">تفريغ القائمة</button>
+      </div>
+      <div class="progress" id="progress-compress"><i></i></div>
+      <div class="status" id="status-compress"></div>
+    </div>
+ 
+    <div class="card">
+      <h2 data-i18n="zip_extract_title">فك ضغط ملف ZIP</h2>
+      <p class="desc" data-i18n="zip_extract_desc">ارفع ملف ZIP وسنعرض محتوياته لتنزيل كل ملف على حدة.</p>
+      <div class="dropzone" id="dz-extract">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M12 3v10m0 0l-3.5-3.5M12 13l3.5-3.5"/><path d="M4 15v4a2 2 0 002 2h12a2 2 0 002-2v-4"/></svg>
+        <b data-i18n="dz_extract_title">اسحب ملف ZIP هنا أو اضغط للاختيار</b>
+        <span data-i18n="dz_extract_sub">ملف واحد بصيغة ZIP</span>
+        <input type="file" id="input-extract" accept=".zip">
+      </div>
+      <div class="status" id="status-extract"></div>
+      <div class="result-list" id="result-extract"></div>
+    </div>
+  </section>
+ 
+  <!-- PANEL 4: convert -->
+  <section class="panel" id="panel-convert">
+    <div class="card">
+      <h2 data-i18n="conv_title">مركز تحويل الصيغ</h2>
+      <p class="desc" data-i18n="conv_desc">اختر نوع التحويل الذي تريده من الأدوات التالية.</p>
+      <div class="subtabs">
+        <button class="subtab-btn active" data-sub="sub-image" data-i18n="sub_image">تحويل صيغة الصور</button>
+        <button class="subtab-btn" data-sub="sub-jsoncsv" data-i18n="sub_jsoncsv">JSON ⇄ CSV</button>
+        <button class="subtab-btn" data-sub="sub-pdfimg" data-i18n="sub_pdfimg">PDF ← صور الصفحات</button>
+      </div>
+ 
+      <div class="subpanel active" id="sub-image">
+        <div class="dropzone" id="dz-conv-image">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg>
+          <b data-i18n="dz_conv_image_title">اسحب الصور هنا أو اضغط للاختيار</b>
+          <span data-i18n="dz_conv_image_sub">يمكنك اختيار عدة صور معًا</span>
+          <input type="file" id="input-conv-image" accept="image/*" multiple>
+        </div>
+        <div class="file-list" id="list-conv-image"></div>
+        <div class="row">
+          <label class="check" data-i18n="conv_target_format">الصيغة المطلوبة
+            <select id="select-image-format">
+              <option value="image/png">PNG</option>
+              <option value="image/jpeg">JPG</option>
+              <option value="image/webp">WEBP</option>
+              <option value="image/bmp">BMP</option>
+            </select>
+          </label>
+          <label class="check" data-i18n="conv_quality">جودة الصورة
+            <input type="range" id="range-quality" min="0.3" max="1" step="0.05" value="0.9">
+          </label>
+        </div>
+        <div class="row">
+          <button class="btn" id="btn-conv-image" disabled data-i18n="btn_convert">حوّل الآن</button>
+          <button class="btn ghost" id="btn-clear-conv-image" data-i18n="btn_clear">تفريغ القائمة</button>
+        </div>
+        <div class="progress" id="progress-conv-image"><i></i></div>
+        <div class="status" id="status-conv-image"></div>
+        <div class="result-list" id="result-conv-image"></div>
+      </div>
+ 
+      <div class="subpanel" id="sub-jsoncsv">
+        <p class="desc" data-i18n="jsoncsv_hint">الصق نص JSON (مصفوفة كائنات) أو CSV بالأسفل، وسنكتشف الاتجاه تلقائيًا.</p>
+        <textarea id="text-jsoncsv-in" placeholder="[{ &quot;name&quot;: &quot;Ali&quot;, &quot;age&quot;: 20 }]"></textarea>
+        <div class="row">
+          <button class="btn" id="btn-conv-jsoncsv" data-i18n="btn_convert">حوّل الآن</button>
+          <button class="btn ghost" id="btn-upload-jsoncsv" data-i18n="btn_upload_file">أو ارفع ملف .json / .csv</button>
+          <input type="file" id="input-jsoncsv" accept=".json,.csv,.txt" style="display:none;">
+        </div>
+        <div class="status" id="status-jsoncsv"></div>
+        <textarea id="text-jsoncsv-out" readonly style="margin-top:12px;"></textarea>
+        <div class="row">
+          <button class="btn amber" id="btn-download-jsoncsv" disabled data-i18n="btn_download">تنزيل الناتج</button>
+        </div>
+      </div>
+ 
+      <div class="subpanel" id="sub-pdfimg">
+        <p class="desc" data-i18n="pdfimg_hint">ارفع ملف PDF وسنحوّل كل صفحة إلى صورة PNG. إذا كان الملف يحتوي أكثر من صفحة سنجمعها في ملف ZIP.</p>
+        <div class="dropzone" id="dz-pdfimg">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M6 2h9l5 5v15H6z"/><path d="M15 2v5h5"/></svg>
+          <b data-i18n="dz_pdfimg_title">اسحب ملف PDF هنا أو اضغط للاختيار</b>
+          <span data-i18n="dz_pdfimg_sub">ملف PDF واحد</span>
+          <input type="file" id="input-pdfimg" accept="application/pdf">
+        </div>
+        <div class="row">
+          <button class="btn" id="btn-conv-pdfimg" disabled data-i18n="btn_convert">حوّل الآن</button>
+        </div>
+        <div class="progress" id="progress-pdfimg"><i></i></div>
+        <div class="status" id="status-pdfimg"></div>
+        <div class="result-list" id="result-pdfimg"></div>
+      </div>
+    </div>
+  </section>
+ 
+  <footer data-i18n="footer_text">صُنع بحب لتسهيل التعامل مع ملفاتك — كل شيء يعمل داخل متصفحك فقط.</footer>
+</div>
+ 
+<div class="robot-dock">
+  <div class="speech" id="robotSpeech"></div>
+  <button class="robot-btn" id="robotBtn" aria-label="robot helper">
+    <svg class="robot-svg robot-float" viewBox="0 0 100 100" fill="none">
+      <rect x="4" y="4" width="6" height="6" class="antenna-dot" fill="var(--amber)"/>
+      <line x1="50" y1="14" x2="50" y2="24" stroke="var(--cyan)" stroke-width="3"/>
+      <circle cx="50" cy="10" r="6" fill="var(--amber)" class="antenna-dot"/>
+      <rect x="24" y="24" width="52" height="42" rx="14" fill="var(--panel-2)" stroke="var(--cyan)" stroke-width="2.5"/>
+      <rect class="eye" x="36" y="40" width="10" height="12" rx="4" fill="var(--cyan)"/>
+      <rect class="eye" x="54" y="40" width="10" height="12" rx="4" fill="var(--cyan)"/>
+      <path d="M38 58 Q50 66 62 58" stroke="var(--amber)" stroke-width="3" fill="none" stroke-linecap="round"/>
+      <rect x="30" y="70" width="40" height="20" rx="8" fill="var(--panel-2)" stroke="var(--cyan)" stroke-width="2.5"/>
+      <line x1="14" y1="74" x2="26" y2="74" stroke="var(--cyan)" stroke-width="3" stroke-linecap="round"/>
+      <line x1="74" y1="74" x2="86" y2="74" stroke="var(--cyan)" stroke-width="3" stroke-linecap="round"/>
+    </svg>
+  </button>
+</div>
+ 
+<script>
+/* ---------------- i18n ---------------- */
+const i18n = {
+  ar: {
+    brand:"ورشة الملفات", brand_sub:"أدوات ملفات ذكية بين يديك",
+    lang_btn:"English", theme_btn:"الوضع الليلي",
+    hero_eyebrow:"مصمم مثل مخطط هندسي — بسيط ودقيق",
+    hero_title:"حوّل، اضغط، وافكّ ملفاتك ", hero_title_accent:"في مكان واحد",
+    hero_lead:"أربع أدوات تعمل بالكامل داخل متصفحك: صور إلى PDF، مسح ورقة إلى PDF، ضغط وفك ضغط الملفات، وتحويل الصيغ. لا حاجة لرفع ملفاتك لأي خادوم.",
+    stat_tools:"أدوات رئيسية", stat_local:"تعمل محليًا في المتصفح", stat_lang:"لغتان مدعومتان",
+    tab_images:"صور ← PDF", tab_scan:"مسح ورقة ← PDF", tab_zip:"ضغط / فك الضغط", tab_convert:"تحويل الصيغ",
+    imgpdf_title:"حوّل الصور إلى ملف PDF واحد",
+    imgpdf_desc:"أضف عدة صور بأي ترتيب، وسنرتبها في صفحات PDF بنفس أبعاد كل صورة.",
+    dz_images_title:"اسحب الصور هنا أو اضغط للاختيار", dz_images_sub:"يدعم JPG, PNG, WEBP",
+    btn_make_pdf:"حوّل إلى PDF", btn_clear:"تفريغ القائمة",
+    scan_title:"حوّل صورة ورقة مكتوبة إلى PDF",
+    scan_desc:"صوّر ورقتك بالكاميرا وارفعها هنا، ويمكنك تفعيل «وضع المسح الضوئي» لتحسين التباين والوضوح كأنها ممسوحة بماسحة ضوئية.",
+    dz_scan_title:"اسحب صورة الورقة هنا أو اضغط للاختيار", dz_scan_sub:"يمكنك إضافة عدة صفحات",
+    chk_scan_mode:"وضع المسح الضوئي (تحسين التباين)",
+    zip_compress_title:"ضغط عدة ملفات إلى ZIP", zip_compress_desc:"اختر أي ملفات وسنجمعها في ملف ZIP واحد يمكنك تنزيله.",
+    dz_compress_title:"اسحب الملفات هنا أو اضغط للاختيار", dz_compress_sub:"أي نوع ملف مسموح",
+    btn_make_zip:"أنشئ ملف ZIP",
+    zip_extract_title:"فك ضغط ملف ZIP", zip_extract_desc:"ارفع ملف ZIP وسنعرض محتوياته لتنزيل كل ملف على حدة.",
+    dz_extract_title:"اسحب ملف ZIP هنا أو اضغط للاختيار", dz_extract_sub:"ملف واحد بصيغة ZIP",
+    conv_title:"مركز تحويل الصيغ", conv_desc:"اختر نوع التحويل الذي تريده من الأدوات التالية.",
+    sub_image:"تحويل صيغة الصور", sub_jsoncsv:"JSON ⇄ CSV", sub_pdfimg:"PDF ← صور الصفحات",
+    dz_conv_image_title:"اسحب الصور هنا أو اضغط للاختيار", dz_conv_image_sub:"يمكنك اختيار عدة صور معًا",
+    conv_target_format:"الصيغة المطلوبة", conv_quality:"جودة الصورة", btn_convert:"حوّل الآن",
+    jsoncsv_hint:"الصق نص JSON (مصفوفة كائنات) أو CSV بالأسفل، وسنكتشف الاتجاه تلقائيًا.",
+    btn_upload_file:"أو ارفع ملف .json / .csv", btn_download:"تنزيل الناتج",
+    pdfimg_hint:"ارفع ملف PDF وسنحوّل كل صفحة إلى صورة PNG. إذا كان الملف يحتوي أكثر من صفحة سنجمعها في ملف ZIP.",
+    dz_pdfimg_title:"اسحب ملف PDF هنا أو اضغط للاختيار", dz_pdfimg_sub:"ملف PDF واحد",
+    footer_text:"صُنع بحب لتسهيل التعامل مع ملفاتك — كل شيء يعمل داخل متصفحك فقط.",
+    robot_welcome:"مرحبًا! أنا مساعدك هنا. اختر أداة من الأعلى وسأشرح لك كل خطوة.",
+    robot_images_tab:"هنا تقدر تجمع عدة صور في ملف PDF واحد. اسحب صورك بالأسفل!",
+    robot_scan_tab:"صوّر ورقتك واختر «وضع المسح الضوئي» للحصول على نتيجة أوضح تشبه الماسحة الضوئية.",
+    robot_zip_tab:"تقدر هنا تضغط عدة ملفات في ZIP واحد، أو تفك ضغط ملف ZIP موجود لديك.",
+    robot_convert_tab:"هنا تحول صيغة الصور، أو تحول بين JSON وCSV، أو تستخرج صور من ملف PDF.",
+    robot_files_added:"تمام! أضفت الملفات. اضغط زر التحويل عندما تكون جاهزًا.",
+    robot_success:"تم بنجاح! تفقّد ملفك الجاهز للتنزيل 🎉",
+    robot_error:"حدث خطأ بسيط، تأكد من نوع الملف وحاول مجددًا.",
+    robot_zip_created:"تم إنشاء ملف ZIP بنجاح! اضغط للتنزيل.",
+    robot_zip_extracted:"تم فك الضغط! كل ملف بالأسفل جاهز للتنزيل.",
+  },
+  en: {
+    brand:"File Workshop", brand_sub:"Smart file tools at your fingertips",
+    lang_btn:"العربية", theme_btn:"Night Mode",
+    hero_eyebrow:"Designed like a blueprint — simple and precise",
+    hero_title:"Convert, compress, and unpack your files ", hero_title_accent:"in one place",
+    hero_lead:"Four tools that run entirely inside your browser: images to PDF, scanned paper to PDF, file compression and extraction, and format conversion. Your files never leave your device.",
+    stat_tools:"Core tools", stat_local:"Runs locally in your browser", stat_lang:"Languages supported",
+    tab_images:"Images → PDF", tab_scan:"Scan Paper → PDF", tab_zip:"Compress / Extract", tab_convert:"Format Converter",
+    imgpdf_title:"Turn your images into one PDF file",
+    imgpdf_desc:"Add several images in any order, and we'll lay them out as PDF pages matching each image's size.",
+    dz_images_title:"Drag images here or click to browse", dz_images_sub:"Supports JPG, PNG, WEBP",
+    btn_make_pdf:"Convert to PDF", btn_clear:"Clear list",
+    scan_title:"Turn a photo of a written page into a PDF",
+    scan_desc:"Photograph your page with your camera and upload it here. Turn on “Scan mode” to boost contrast and clarity like a real scanner.",
+    dz_scan_title:"Drag the page photo here or click to browse", dz_scan_sub:"You can add multiple pages",
+    chk_scan_mode:"Scan mode (boost contrast)",
+    zip_compress_title:"Compress several files into a ZIP", zip_compress_desc:"Pick any files and we'll bundle them into one downloadable ZIP.",
+    dz_compress_title:"Drag files here or click to browse", dz_compress_sub:"Any file type is allowed",
+    btn_make_zip:"Create ZIP file",
+    zip_extract_title:"Extract a ZIP file", zip_extract_desc:"Upload a ZIP and we'll list its contents so you can download each file.",
+    dz_extract_title:"Drag a ZIP file here or click to browse", dz_extract_sub:"One ZIP file",
+    conv_title:"Format Conversion Hub", conv_desc:"Pick the conversion you need from the tools below.",
+    sub_image:"Image format converter", sub_jsoncsv:"JSON ⇄ CSV", sub_pdfimg:"PDF → page images",
+    dz_conv_image_title:"Drag images here or click to browse", dz_conv_image_sub:"You can select several images at once",
+    conv_target_format:"Target format", conv_quality:"Image quality", btn_convert:"Convert now",
+    jsoncsv_hint:"Paste JSON (array of objects) or CSV below and we'll detect the direction automatically.",
+    btn_upload_file:"or upload a .json / .csv file", btn_download:"Download result",
+    pdfimg_hint:"Upload a PDF and we'll turn each page into a PNG image. Multi-page files are bundled into a ZIP.",
+    dz_pdfimg_title:"Drag a PDF file here or click to browse", dz_pdfimg_sub:"One PDF file",
+    footer_text:"Made with care to make working with files easier — everything runs only inside your browser.",
+    robot_welcome:"Hi! I'm your guide here. Pick a tool above and I'll explain each step.",
+    robot_images_tab:"Here you can combine several images into one PDF. Drop your images below!",
+    robot_scan_tab:"Photograph your page and turn on “Scan mode” for a crisper, scanner-like result.",
+    robot_zip_tab:"Here you can compress several files into one ZIP, or extract a ZIP file you already have.",
+    robot_convert_tab:"Here you can convert image formats, convert between JSON and CSV, or pull images out of a PDF.",
+    robot_files_added:"Great, files added! Hit the convert button whenever you're ready.",
+    robot_success:"All done! Your file is ready to download 🎉",
+    robot_error:"Something went wrong — double check the file type and try again.",
+    robot_zip_created:"Your ZIP file is ready! Click to download.",
+    robot_zip_extracted:"Extracted! Every file below is ready to download.",
+  }
+};
+let currentLang = 'ar';
+ 
+function applyLanguage(lang){
+  currentLang = lang;
+  const dict = i18n[lang];
+  document.documentElement.lang = lang;
+  document.documentElement.dir = lang === 'ar' ? 'rtl' : 'ltr';
+  document.body.classList.toggle('lang-ar', lang === 'ar');
+  document.querySelectorAll('[data-i18n]').forEach(el=>{
+    const key = el.getAttribute('data-i18n');
+    if(dict[key] !== undefined){
+      // preserve child elements (like the accent span) by only replacing text nodes when needed
+      if(el.children.length === 0){
+        el.textContent = dict[key];
+      } else {
+        el.childNodes[0].textContent = dict[key];
+      }
+    }
+  });
+}
+ 
+/* ---------------- theme ---------------- */
+function applyTheme(light){
+  document.body.classList.toggle('light', light);
+}
+let isLight = false;
+document.getElementById('themeToggle').addEventListener('click', ()=>{
+  isLight = !isLight;
+  applyTheme(isLight);
+});
+document.getElementById('langToggle').addEventListener('click', ()=>{
+  applyLanguage(currentLang === 'ar' ? 'en' : 'ar');
+  setRobotMessage(getRobotKeyForTab(currentTab));
+});
+ 
+/* ---------------- robot ---------------- */
+let speechTimer = null;
+function setRobotMessage(key){
+  const el = document.getElementById('robotSpeech');
+  el.textContent = i18n[currentLang][key] || '';
+  el.classList.add('show');
+  clearTimeout(speechTimer);
+  speechTimer = setTimeout(()=> el.classList.remove('show'), 6000);
+}
+document.getElementById('robotBtn').addEventListener('click', ()=>{
+  setRobotMessage(getRobotKeyForTab(currentTab));
+});
+function getRobotKeyForTab(tab){
+  const map = { 'images-pdf':'robot_images_tab', 'scan-pdf':'robot_scan_tab', 'zip':'robot_zip_tab', 'convert':'robot_convert_tab' };
+  return map[tab] || 'robot_welcome';
+}
+ 
+/* ---------------- tabs ---------------- */
+let currentTab = 'images-pdf';
+document.querySelectorAll('.tab-btn').forEach(btn=>{
+  btn.addEventListener('click', ()=>{
+    document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+    document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
+    btn.classList.add('active');
+    currentTab = btn.getAttribute('data-tab');
+    document.getElementById('panel-'+currentTab).classList.add('active');
+    setRobotMessage(getRobotKeyForTab(currentTab));
+  });
+});
+document.querySelectorAll('.subtab-btn').forEach(btn=>{
+  btn.addEventListener('click', ()=>{
+    document.querySelectorAll('.subtab-btn').forEach(b=>b.classList.remove('active'));
+    document.querySelectorAll('.subpanel').forEach(p=>p.classList.remove('active'));
+    btn.classList.add('active');
+    document.getElementById(btn.getAttribute('data-sub')).classList.add('active');
+  });
+});
+ 
+/* ---------------- helpers ---------------- */
+function downloadBlob(blob, filename){
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = filename;
+  document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(()=>URL.revokeObjectURL(url), 4000);
+}
+function setStatus(id, text, cls){
+  const el = document.getElementById(id);
+  el.textContent = text;
+  el.className = 'status' + (cls ? (' '+cls) : '');
+}
+function setProgress(id, pct){
+  const box = document.getElementById(id);
+  box.classList.toggle('show', pct > 0 && pct < 100);
+  box.querySelector('i').style.width = pct + '%';
+}
+function fileToDataURL(file){
+  return new Promise((resolve,reject)=>{
+    const r = new FileReader();
+    r.onload = ()=>resolve(r.result);
+    r.onerror = reject;
+    r.readAsDataURL(file);
+  });
+}
+function loadImage(src){
+  return new Promise((resolve,reject)=>{
+    const img = new Image();
+    img.onload = ()=>resolve(img);
+    img.onerror = reject;
+    img.src = src;
+  });
+}
+function attachDropzone(dzId, inputId, onFiles){
+  const dz = document.getElementById(dzId);
+  const input = document.getElementById(inputId);
+  dz.addEventListener('click', ()=>input.click());
+  input.addEventListener('change', ()=> onFiles(Array.from(input.files)));
+  ['dragenter','dragover'].forEach(ev=>dz.addEventListener(ev, e=>{ e.preventDefault(); dz.classList.add('drag'); }));
+  ['dragleave','drop'].forEach(ev=>dz.addEventListener(ev, e=>{ e.preventDefault(); dz.classList.remove('drag'); }));
+  dz.addEventListener('drop', e=>{
+    const files = Array.from(e.dataTransfer.files);
+    if(files.length) onFiles(files);
+  });
+}
+function renderFileChip(container, file, dataURLorNull, onRemove){
+  const chip = document.createElement('div');
+  chip.className = 'file-chip';
+  if(dataURLorNull){
+    const img = document.createElement('img');
+    img.src = dataURLorNull;
+    chip.appendChild(img);
+  }
+  const name = document.createElement('span');
+  name.className = 'fname';
+  name.textContent = file.name;
+  chip.appendChild(name);
+  const rm = document.createElement('button');
+  rm.textContent = '✕';
+  rm.addEventListener('click', onRemove);
+  chip.appendChild(rm);
+  container.appendChild(chip);
+  return chip;
+}
+ 
+/* ================= TOOL 1: Images -> PDF ================= */
+let imagesQueue = [];
+attachDropzone('dz-images','input-images', async (files)=>{
+  for(const f of files){
+    if(!f.type.startsWith('image/')) continue;
+    const dataURL = await fileToDataURL(f);
+    imagesQueue.push({ file:f, dataURL });
+  }
+  renderImagesList();
+  setRobotMessage('robot_files_added');
+});
+function renderImagesList(){
+  const box = document.getElementById('list-images');
+  box.innerHTML = '';
+  imagesQueue.forEach((item, idx)=>{
+    renderFileChip(box, item.file, item.dataURL, ()=>{
+      imagesQueue.splice(idx,1);
+      renderImagesList();
+    });
+  });
+  document.getElementById('btn-make-pdf').disabled = imagesQueue.length === 0;
+}
+document.getElementById('btn-clear-images').addEventListener('click', ()=>{
+  imagesQueue = []; renderImagesList(); setStatus('status-images','');
+});
+document.getElementById('btn-make-pdf').addEventListener('click', async ()=>{
+  if(!imagesQueue.length) return;
+  setStatus('status-images', currentLang==='ar' ? 'جارٍ التحويل...' : 'Converting...');
+  setProgress('progress-images', 10);
+  try{
+    const { jsPDF } = window.jspdf;
+    let doc = null;
+    for(let i=0;i<imagesQueue.length;i++){
+      const img = await loadImage(imagesQueue[i].dataURL);
+      const w = img.naturalWidth, h = img.naturalHeight;
+      const orientation = w >= h ? 'l' : 'p';
+      if(!doc){
+        doc = new jsPDF({ orientation, unit:'px', format:[w,h] });
+      } else {
+        doc.addPage([w,h], orientation);
+      }
+      doc.addImage(img, 'JPEG', 0, 0, w, h);
+      setProgress('progress-images', 10 + Math.round(((i+1)/imagesQueue.length)*80));
+    }
+    doc.save('images-to-pdf.pdf');
+    setProgress('progress-images', 100);
+    setTimeout(()=>setProgress('progress-images',0), 600);
+    setStatus('status-images', currentLang==='ar' ? 'تم إنشاء ملف PDF وتنزيله ✅' : 'PDF created and downloaded ✅', 'ok');
+    setRobotMessage('robot_success');
+  }catch(err){
+    console.error(err);
+    setStatus('status-images', currentLang==='ar' ? 'حدث خطأ أثناء التحويل' : 'An error occurred during conversion', 'err');
+    setRobotMessage('robot_error');
+  }
+});
+ 
+/* ================= TOOL 2: Scan -> PDF ================= */
+let scanQueue = [];
+attachDropzone('dz-scan','input-scan', async (files)=>{
+  for(const f of files){
+    if(!f.type.startsWith('image/')) continue;
+    const dataURL = await fileToDataURL(f);
+    scanQueue.push({ file:f, dataURL });
+  }
+  renderScanList();
+  setRobotMessage('robot_files_added');
+});
+function renderScanList(){
+  const box = document.getElementById('list-scan');
+  box.innerHTML = '';
+  scanQueue.forEach((item, idx)=>{
+    renderFileChip(box, item.file, item.dataURL, ()=>{
+      scanQueue.splice(idx,1);
+      renderScanList();
+    });
+  });
+  document.getElementById('btn-make-scan-pdf').disabled = scanQueue.length === 0;
+}
+document.getElementById('btn-clear-scan').addEventListener('click', ()=>{
+  scanQueue = []; renderScanList(); setStatus('status-scan','');
+});
+function applyScanFilter(canvas, ctx){
+  const imgData = ctx.getImageData(0,0,canvas.width, canvas.height);
+  const d = imgData.data;
+  const contrast = 1.35, brightness = 18;
+  for(let i=0;i<d.length;i+=4){
+    let gray = 0.299*d[i] + 0.587*d[i+1] + 0.114*d[i+2];
+    gray = (gray - 128) * contrast + 128 + brightness;
+    gray = Math.max(0, Math.min(255, gray));
+    d[i]=gray; d[i+1]=gray; d[i+2]=gray;
+  }
+  ctx.putImageData(imgData,0,0);
+}
+document.getElementById('btn-make-scan-pdf').addEventListener('click', async ()=>{
+  if(!scanQueue.length) return;
+  const scanMode = document.getElementById('chk-scan-mode').checked;
+  setStatus('status-scan', currentLang==='ar' ? 'جارٍ التحويل...' : 'Converting...');
+  setProgress('progress-scan', 10);
+  try{
+    const { jsPDF } = window.jspdf;
+    let doc = null;
+    for(let i=0;i<scanQueue.length;i++){
+      const img = await loadImage(scanQueue[i].dataURL);
+      const canvas = document.createElement('canvas');
+      canvas.width = img.naturalWidth; canvas.height = img.naturalHeight;
+      const ctx = canvas.getContext('2d');
+      ctx.drawImage(img,0,0);
+      if(scanMode) applyScanFilter(canvas, ctx);
+      const outURL = canvas.toDataURL('image/jpeg', 0.92);
+      const w = canvas.width, h = canvas.height;
+      const orientation = w >= h ? 'l' : 'p';
+      if(!doc){
+        doc = new jsPDF({ orientation, unit:'px', format:[w,h] });
+      } else {
+        doc.addPage([w,h], orientation);
+      }
+      doc.addImage(outURL, 'JPEG', 0, 0, w, h);
+      setProgress('progress-scan', 10 + Math.round(((i+1)/scanQueue.length)*80));
+    }
+    doc.save('scanned-document.pdf');
+    setProgress('progress-scan', 100);
+    setTimeout(()=>setProgress('progress-scan',0), 600);
+    setStatus('status-scan', currentLang==='ar' ? 'تم إنشاء ملف PDF وتنزيله ✅' : 'PDF created and downloaded ✅', 'ok');
+    setRobotMessage('robot_success');
+  }catch(err){
+    console.error(err);
+    setStatus('status-scan', currentLang==='ar' ? 'حدث خطأ أثناء التحويل' : 'An error occurred during conversion', 'err');
+    setRobotMessage('robot_error');
+  }
+});
+ 
+/* ================= TOOL 3: ZIP compress / extract ================= */
+let compressQueue = [];
+attachDropzone('dz-compress','input-compress', (files)=>{
+  compressQueue.push(...files);
+  renderCompressList();
+  setRobotMessage('robot_files_added');
+});
+function renderCompressList(){
+  const box = document.getElementById('list-compress');
+  box.innerHTML = '';
+  compressQueue.forEach((file, idx)=>{
+    renderFileChip(box, file, null, ()=>{
+      compressQueue.splice(idx,1);
+      renderCompressList();
+    });
+  });
+  document.getElementById('btn-make-zip').disabled = compressQueue.length === 0;
+}
+document.getElementById('btn-clear-compress').addEventListener('click', ()=>{
+  compressQueue = []; renderCompressList(); setStatus('status-compress','');
+});
+document.getElementById('btn-make-zip').addEventListener('click', async ()=>{
+  if(!compressQueue.length) return;
+  setStatus('status-compress', currentLang==='ar' ? 'جارٍ الضغط...' : 'Compressing...');
+  setProgress('progress-compress', 15);
+  try{
+    const zip = new JSZip();
+    compressQueue.forEach(f=> zip.file(f.name, f));
+    const blob = await zip.generateAsync({ type:'blob', compression:'DEFLATE' }, (meta)=>{
+      setProgress('progress-compress', Math.round(meta.percent));
+    });
+    downloadBlob(blob, 'archive.zip');
+    setProgress('progress-compress', 100);
+    setTimeout(()=>setProgress('progress-compress',0), 600);
+    setStatus('status-compress', currentLang==='ar' ? 'تم إنشاء ZIP وتنزيله ✅' : 'ZIP created and downloaded ✅', 'ok');
+    setRobotMessage('robot_zip_created');
+  }catch(err){
+    console.error(err);
+    setStatus('status-compress', currentLang==='ar' ? 'حدث خطأ أثناء الضغط' : 'An error occurred while compressing', 'err');
+    setRobotMessage('robot_error');
+  }
+});
+ 
+attachDropzone('dz-extract','input-extract', async (files)=>{
+  const file = files[0];
+  if(!file) return;
+  setStatus('status-extract', currentLang==='ar' ? 'جارٍ فك الضغط...' : 'Extracting...');
+  const resBox = document.getElementById('result-extract');
+  resBox.innerHTML = '';
+  try{
+    const zip = await JSZip.loadAsync(file);
+    const entries = Object.values(zip.files).filter(e=>!e.dir);
+    for(const entry of entries){
+      const blob = await entry.async('blob');
+      const url = URL.createObjectURL(blob);
+      const row = document.createElement('div');
+      row.className = 'result-item';
+      const label = document.createElement('span');
+      label.textContent = entry.name;
+      const link = document.createElement('a');
+      link.href = url; link.download = entry.name.split('/').pop();
+      link.textContent = currentLang==='ar' ? 'تنزيل' : 'Download';
+      row.appendChild(label); row.appendChild(link);
+      resBox.appendChild(row);
+    }
+    setStatus('status-extract', currentLang==='ar' ? ('تم استخراج '+entries.length+' ملف/ملفات ✅') : ('Extracted '+entries.length+' file(s) ✅'), 'ok');
+    setRobotMessage('robot_zip_extracted');
+  }catch(err){
+    console.error(err);
+    setStatus('status-extract', currentLang==='ar' ? 'تعذر فتح ملف ZIP، تأكد أنه غير تالف' : 'Could not open the ZIP file, make sure it is not corrupted', 'err');
+    setRobotMessage('robot_error');
+  }
+});
+ 
+/* ================= TOOL 4a: image format converter ================= */
+let convImageQueue = [];
+attachDropzone('dz-conv-image','input-conv-image', async (files)=>{
+  for(const f of files){
+    if(!f.type.startsWith('image/')) continue;
+    const dataURL = await fileToDataURL(f);
+    convImageQueue.push({ file:f, dataURL });
+  }
+  renderConvImageList();
+  setRobotMessage('robot_files_added');
+});
+function renderConvImageList(){
+  const box = document.getElementById('list-conv-image');
+  box.innerHTML = '';
+  convImageQueue.forEach((item, idx)=>{
+    renderFileChip(box, item.file, item.dataURL, ()=>{
+      convImageQueue.splice(idx,1);
+      renderConvImageList();
+    });
+  });
+  document.getElementById('btn-conv-image').disabled = convImageQueue.length === 0;
+}
+document.getElementById('btn-clear-conv-image').addEventListener('click', ()=>{
+  convImageQueue = []; renderConvImageList(); setStatus('status-conv-image',''); document.getElementById('result-conv-image').innerHTML='';
+});
+document.getElementById('btn-conv-image').addEventListener('click', async ()=>{
+  if(!convImageQueue.length) return;
+  const mime = document.getElementById('select-image-format').value;
+  const quality = parseFloat(document.getElementById('range-quality').value);
+  const ext = mime.split('/')[1] === 'jpeg' ? 'jpg' : mime.split('/')[1];
+  setStatus('status-conv-image', currentLang==='ar' ? 'جارٍ التحويل...' : 'Converting...');
+  setProgress('progress-conv-image', 10);
+  const resBox = document.getElementById('result-conv-image');
+  resBox.innerHTML = '';
+  try{
+    const outputs = [];
+    for(let i=0;i<convImageQueue.length;i++){
+      const img = await loadImage(convImageQueue[i].dataURL);
+      const canvas = document.createElement('canvas');
+      canvas.width = img.naturalWidth; canvas.height = img.naturalHeight;
+      const ctx = canvas.getContext('2d');
+      if(mime === 'image/jpeg' || mime === 'image/bmp'){
+        ctx.fillStyle = '#FFFFFF';
+        ctx.fillRect(0,0,canvas.width,canvas.height);
+      }
+      ctx.drawImage(img,0,0);
+      const blob = await new Promise(res=> canvas.toBlob(res, mime === 'image/bmp' ? 'image/png' : mime, quality));
+      const baseName = convImageQueue[i].file.name.replace(/\.[^.]+$/, '');
+      outputs.push({ name: baseName+'.'+ext, blob });
+      setProgress('progress-conv-image', 10 + Math.round(((i+1)/convImageQueue.length)*80));
+    }
+    if(outputs.length === 1){
+      downloadBlob(outputs[0].blob, outputs[0].name);
+    } else {
+      const zip = new JSZip();
+      outputs.forEach(o=> zip.file(o.name, o.blob));
+      const zblob = await zip.generateAsync({ type:'blob' });
+      downloadBlob(zblob, 'converted-images.zip');
+    }
+    outputs.forEach(o=>{
+      const row = document.createElement('div');
+      row.className = 'result-item';
+      const label = document.createElement('span'); label.textContent = o.name;
+      const link = document.createElement('a');
+      link.href = URL.createObjectURL(o.blob); link.download = o.name;
+      link.textContent = currentLang==='ar' ? 'تنزيل' : 'Download';
+      row.appendChild(label); row.appendChild(link);
+      resBox.appendChild(row);
+    });
+    setProgress('progress-conv-image', 100);
+    setTimeout(()=>setProgress('progress-conv-image',0), 600);
+    setStatus('status-conv-image', currentLang==='ar' ? 'تم التحويل بنجاح ✅' : 'Converted successfully ✅', 'ok');
+    setRobotMessage('robot_success');
+  }catch(err){
+    console.error(err);
+    setStatus('status-conv-image', currentLang==='ar' ? 'حدث خطأ أثناء التحويل' : 'An error occurred during conversion', 'err');
+    setRobotMessage('robot_error');
+  }
+});
+ 
+/* ================= TOOL 4b: JSON <-> CSV ================= */
+function csvToJson(csv){
+  const lines = csv.trim().split(/\r?\n/);
+  const headers = splitCsvLine(lines[0]);
+  const rows = lines.slice(1).filter(l=>l.trim().length).map(line=>{
+    const cells = splitCsvLine(line);
+    const obj = {};
+    headers.forEach((h,i)=> obj[h] = cells[i] !== undefined ? cells[i] : '');
+    return obj;
+  });
+  return JSON.stringify(rows, null, 2);
+}
+function splitCsvLine(line){
+  const result = []; let cur=''; let inQuotes=false;
+  for(let i=0;i<line.length;i++){
+    const c = line[i];
+    if(inQuotes){
+      if(c === '"'){
+        if(line[i+1] === '"'){ cur+='"'; i++; } else { inQuotes=false; }
+      } else cur += c;
+    } else {
+      if(c === '"') inQuotes = true;
+      else if(c === ','){ result.push(cur); cur=''; }
+      else cur += c;
+    }
+  }
+  result.push(cur);
+  return result.map(s=>s.trim());
+}
+function jsonToCsv(jsonText){
+  const data = JSON.parse(jsonText);
+  const arr = Array.isArray(data) ? data : [data];
+  const headers = Array.from(arr.reduce((set,obj)=>{ Object.keys(obj).forEach(k=>set.add(k)); return set; }, new Set()));
+  const escape = (v)=>{
+    if(v === undefined || v === null) return '';
+    const s = String(v);
+    return /[",\n]/.test(s) ? '"'+s.replace(/"/g,'""')+'"' : s;
+  };
+  const lines = [headers.join(',')];
+  arr.forEach(obj=> lines.push(headers.map(h=>escape(obj[h])).join(',')));
+  return lines.join('\n');
+}
+let lastJsonCsvOutput = null;
+let lastJsonCsvIsJson = false;
+document.getElementById('btn-conv-jsoncsv').addEventListener('click', ()=>{
+  const input = document.getElementById('text-jsoncsv-in').value.trim();
+  const outBox = document.getElementById('text-jsoncsv-out');
+  if(!input){
+    setStatus('status-jsoncsv', currentLang==='ar' ? 'الرجاء إدخال نص أولًا' : 'Please enter some text first', 'err');
+    return;
+  }
+  try{
+    if(input.startsWith('{') || input.startsWith('[')){
+      const csv = jsonToCsv(input);
+      outBox.value = csv;
+      lastJsonCsvOutput = csv; lastJsonCsvIsJson = false;
+      setStatus('status-jsoncsv', currentLang==='ar' ? 'تم التحويل من JSON إلى CSV ✅' : 'Converted JSON to CSV ✅', 'ok');
+    } else {
+      const json = csvToJson(input);
+      outBox.value = json;
+      lastJsonCsvOutput = json; lastJsonCsvIsJson = true;
+      setStatus('status-jsoncsv', currentLang==='ar' ? 'تم التحويل من CSV إلى JSON ✅' : 'Converted CSV to JSON ✅', 'ok');
+    }
+    document.getElementById('btn-download-jsoncsv').disabled = false;
+    setRobotMessage('robot_success');
+  }catch(err){
+    console.error(err);
+    setStatus('status-jsoncsv', currentLang==='ar' ? 'تعذر فهم النص، تأكد من صيغته' : 'Could not parse the text, please check its format', 'err');
+    setRobotMessage('robot_error');
+  }
+});
+document.getElementById('btn-upload-jsoncsv').addEventListener('click', ()=> document.getElementById('input-jsoncsv').click());
+document.getElementById('input-jsoncsv').addEventListener('change', async (e)=>{
+  const file = e.target.files[0];
+  if(!file) return;
+  const text = await file.text();
+  document.getElementById('text-jsoncsv-in').value = text;
+});
+document.getElementById('btn-download-jsoncsv').addEventListener('click', ()=>{
+  if(!lastJsonCsvOutput) return;
+  const blob = new Blob([lastJsonCsvOutput], { type: lastJsonCsvIsJson ? 'application/json' : 'text/csv' });
+  downloadBlob(blob, lastJsonCsvIsJson ? 'converted.json' : 'converted.csv');
+});
+ 
+/* ================= TOOL 4c: PDF -> images ================= */
+if(window['pdfjsLib']){
+  pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+}
+let pdfImgFile = null;
+attachDropzone('dz-pdfimg','input-pdfimg', (files)=>{
+  const file = files[0];
+  if(!file) return;
+  pdfImgFile = file;
+  document.getElementById('btn-conv-pdfimg').disabled = false;
+  setRobotMessage('robot_files_added');
+});
+document.getElementById('btn-conv-pdfimg').addEventListener('click', async ()=>{
+  if(!pdfImgFile || !window['pdfjsLib']) return;
+  setStatus('status-pdfimg', currentLang==='ar' ? 'جارٍ استخراج الصفحات...' : 'Extracting pages...');
+  setProgress('progress-pdfimg', 10);
+  const resBox = document.getElementById('result-pdfimg');
+  resBox.innerHTML = '';
+  try{
+    const buf = await pdfImgFile.arrayBuffer();
+    const pdf = await pdfjsLib.getDocument({ data: buf }).promise;
+    const outputs = [];
+    for(let p=1; p<=pdf.numPages; p++){
+      const page = await pdf.getPage(p);
+      const viewport = page.getViewport({ scale: 2 });
+      const canvas = document.createElement('canvas');
+      canvas.width = viewport.width; canvas.height = viewport.height;
+      const ctx = canvas.getContext('2d');
+      await page.render({ canvasContext: ctx, viewport }).promise;
+      const blob = await new Promise(res=> canvas.toBlob(res, 'image/png'));
+      outputs.push({ name: 'page-'+p+'.png', blob });
+      setProgress('progress-pdfimg', 10 + Math.round((p/pdf.numPages)*80));
+    }
+    if(outputs.length === 1){
+      downloadBlob(outputs[0].blob, outputs[0].name);
+    } else {
+      const zip = new JSZip();
+      outputs.forEach(o=> zip.file(o.name, o.blob));
+      const zblob = await zip.generateAsync({ type:'blob' });
+      downloadBlob(zblob, 'pdf-pages.zip');
+    }
+    outputs.forEach(o=>{
+      const row = document.createElement('div');
+      row.className = 'result-item';
+      const label = document.createElement('span'); label.textContent = o.name;
+      const link = document.createElement('a');
+      link.href = URL.createObjectURL(o.blob); link.download = o.name;
+      link.textContent = currentLang==='ar' ? 'تنزيل' : 'Download';
+      row.appendChild(label); row.appendChild(link);
+      resBox.appendChild(row);
+    });
+    setProgress('progress-pdfimg', 100);
+    setTimeout(()=>setProgress('progress-pdfimg',0), 600);
+    setStatus('status-pdfimg', currentLang==='ar' ? 'تم استخراج الصفحات بنجاح ✅' : 'Pages extracted successfully ✅', 'ok');
+    setRobotMessage('robot_success');
+  }catch(err){
+    console.error(err);
+    setStatus('status-pdfimg', currentLang==='ar' ? 'تعذرت قراءة ملف PDF' : 'Could not read the PDF file', 'err');
+    setRobotMessage('robot_error');
+  }
+});
+ 
+/* ---------------- init ---------------- */
+applyLanguage('ar');
+setTimeout(()=> setRobotMessage('robot_welcome'), 900);
+</script>
+</body>
+</html>
+ 
